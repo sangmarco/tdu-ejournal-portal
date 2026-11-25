@@ -1,0 +1,5 @@
+# Multi-Journal OJS 3.5.0.6
+User confirmed GET http://localhost/ojs/index.php/tapchi1/api/v1/issues works. No JSON sample was supplied. Context discovery, public anonymous permissions, pagination and published flags remain unverified.
+Phase 1 adds separate server-rendered directory and journal pages, using anonymous GET only. No API key is sent. Existing single-journal routes are not migrated. Explicitly configured public journal paths override discovery; operator must verify these paths are public. Unknown schemas fail closed; issues require explicit published=true or 1. Article details remain on OJS.
+Before merging: run npm ci, npm run lint, npx tsc --noEmit, npm run build. Test two journals on localhost, verify contexts and issues JSON, anonymous access, hidden journals and unpublished issues, pagination, error states and links. Verify installed Next documentation as requested by AGENTS.md. No build or live OJS test was performed in this session.
+Next phase: replace legacy client/hooks, migrate home and archive routes, add verified publication mapping and cross-journal search. Do not expose privileged API responses or use legacy status=7 assumption.

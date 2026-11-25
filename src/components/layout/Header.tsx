@@ -17,6 +17,7 @@ export function Header({ locale }: HeaderProps) {
 
   const navItems = [
     { href: '/', label: t('common', 'home', currentLocale) },
+    { href: '/journals', label: currentLocale === 'vi' ? 'Tạp chí' : 'Journals' },
     { href: '/about', label: t('common', 'about', currentLocale) },
     { href: '/current-issue', label: t('common', 'currentIssue', currentLocale) },
     { href: '/archives', label: t('common', 'archives', currentLocale) },
