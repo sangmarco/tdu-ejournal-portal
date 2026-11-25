@@ -16,6 +16,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: CopyrightPageProps): Promise<Metadata> {
   const { locale } = await params;
+  if (!locales.includes(locale)) notFound();
   const t = dict[locale];
   return {
     title: t.copyrightTitle,
@@ -54,7 +55,7 @@ export default async function CopyrightPage({ params }: CopyrightPageProps) {
             <h3 className="font-semibold text-gray-900 mb-4">{t.authorRetainCopyright}</h3>
             <p className="text-gray-600 mb-4">{t.authorRetainCopyrightDesc}</p>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
-              {t.authorRightsItems.map((item: string, i: number) => (
+              {t.authorRightsItems?.map((item: string, i: number) => (
                 <li key={i}>{item}</li>
               ))}
             </ul>
@@ -63,7 +64,7 @@ export default async function CopyrightPage({ params }: CopyrightPageProps) {
             <h3 className="font-semibold text-gray-900 mb-4">{t.authorGrantLicense}</h3>
             <p className="text-gray-600 mb-4">{t.authorGrantLicenseDesc}</p>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
-              {t.licenseGrantItems.map((item: string, i: number) => (
+              {t.licenseGrantItems?.map((item: string, i: number) => (
                 <li key={i}>{item}</li>
               ))}
             </ul>
@@ -78,7 +79,7 @@ export default async function CopyrightPage({ params }: CopyrightPageProps) {
           <h3 className="font-semibold text-gray-900 mb-4">{t.journalRightsTitle}</h3>
           <p className="text-gray-600 mb-4">{t.journalRightsDesc}</p>
           <ul className="list-disc list-inside space-y-2 text-gray-700">
-            {t.journalRightsItems.map((item: string, i: number) => (
+            {t.journalRightsItems?.map((item: string, i: number) => (
               <li key={i}>{item}</li>
             ))}
           </ul>
@@ -90,7 +91,7 @@ export default async function CopyrightPage({ params }: CopyrightPageProps) {
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">{t.creativeCommonsLicenses}</h2>
         <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">{t.ccLicensesDesc}</p>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
-          {t.ccLicenses.map((license: { id: string; name: string; desc: string; permissions: string[] }, i: number) => (
+          {t.ccLicenses?.map((license: { id: string; name: string; desc: string; permissions: string[] }, i: number) => (
             <Card key={license.id} className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Badge variant={license.id === 'CC BY 4.0' ? 'success' : 'outline'}>{license.name}</Badge>
@@ -118,7 +119,7 @@ export default async function CopyrightPage({ params }: CopyrightPageProps) {
           <h3 className="font-semibold text-gray-900 mb-4">{t.thirdPartyContentTitle}</h3>
           <p className="text-gray-600 mb-4">{t.thirdPartyContentDesc}</p>
           <ul className="list-disc list-inside space-y-2 text-gray-700">
-            {t.thirdPartyContentItems.map((item: string, i: number) => (
+            {t.thirdPartyContentItems?.map((item: string, i: number) => (
               <li key={i}>{item}</li>
             ))}
           </ul>

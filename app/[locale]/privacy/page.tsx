@@ -14,6 +14,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PrivacyPageProps): Promise<Metadata> {
   const { locale } = await params;
+  if (!locales.includes(locale)) notFound();
   const t = dict[locale];
   return {
     title: t.privacyTitle,
@@ -26,7 +27,6 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
   if (!locales.includes(locale)) notFound();
 
   const t = dict[locale];
-  const lastUpdated = new Date().toLocaleDateString(locale);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -42,12 +42,11 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
 
       <header className="mb-12 max-w-3xl">
         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{t.privacyTitle}</h1>
-        <p className="text-sm text-gray-500 mb-6">{t.lastUpdated} {lastUpdated}</p>
         <p className="text-lg text-gray-600">{t.privacyIntro}</p>
       </header>
 
       <div className="max-w-3xl space-y-10">
-        {t.privacySections.map((section: { title: string; content: string[] }, i: number) => (
+        {t.privacySections?.map((section: { title: string; content: string[] }, i: number) => (
           <section key={i} className="prose prose-gray max-w-none">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">{section.title}</h2>
             <div className="space-y-4">

@@ -1,7 +1,7 @@
 // Main Layout Wrapper
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 
@@ -17,7 +17,9 @@ export function MainLayout({ children, locale }: MainLayoutProps) {
       <main className="flex-1" id="main-content">
         {children}
       </main>
-      <Footer locale={locale} />
+      <Suspense fallback={null}>
+        <Footer locale={locale} />
+      </Suspense>
     </div>
   );
 }

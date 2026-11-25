@@ -15,6 +15,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: SubmissionsPageProps): Promise<Metadata> {
   const { locale } = await params;
+  if (!locales.includes(locale)) notFound();
   const t = dict[locale];
   return {
     title: t.submissionsTitle,
@@ -133,15 +134,15 @@ export default async function SubmissionsPage({ params }: SubmissionsPageProps) 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
           <RequirementCard
             title={t.beforeSubmitting}
-            items={t.beforeSubmittingItems}
+            items={t.beforeSubmittingItems ?? []}
           />
           <RequirementCard
             title={t.manuscriptRequirements}
-            items={t.manuscriptRequirementsItems}
+            items={t.manuscriptRequirementsItems ?? []}
           />
           <RequirementCard
             title={t.ethicalRequirements}
-            items={t.ethicalRequirementsItems}
+            items={t.ethicalRequirementsItems ?? []}
           />
         </div>
       </section>
@@ -151,7 +152,7 @@ export default async function SubmissionsPage({ params }: SubmissionsPageProps) 
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">{t.submissionChecklist}</h2>
         <Card className="max-w-3xl mx-auto p-6">
           <ul className="space-y-3">
-            {t.checklistItems.map((item: string, i: number) => (
+            {t.checklistItems?.map((item: string, i: number) => (
               <li key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                 <input
                   type="checkbox"

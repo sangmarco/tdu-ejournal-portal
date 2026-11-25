@@ -16,6 +16,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: AuthorGuidelinesPageProps): Promise<Metadata> {
   const { locale } = await params;
+  if (!locales.includes(locale)) notFound();
   const t = dict[locale];
   return {
     title: t.authorGuidelinesTitle,
@@ -82,7 +83,7 @@ function SectionCard({ section, locale }: { section: typeof sections[0]; locale:
         {t[section.titleKey]}
       </h2>
       <div className="prose prose-gray max-w-none text-gray-700">
-        {t[section.contentKey].map((paragraph: string, i: number) => (
+        {t[section.contentKey]?.map((paragraph: string, i: number) => (
           <p key={i} className="mb-4">{paragraph}</p>
         ))}
       </div>
@@ -109,7 +110,7 @@ function QuickReferenceCard({ locale }: { locale: Locale }) {
       <div className="mt-6 pt-6 border-t">
         <h4 className="font-medium text-gray-900 mb-3">{t.keyPoints}</h4>
         <ul className="space-y-2 text-sm text-gray-600">
-          {t.keyPointsItems.map((item: string, i: number) => (
+          {t.keyPointsItems?.map((item: string, i: number) => (
             <li key={i} className="flex items-start gap-2">
               <span className="text-primary-600">•</span>
               <span>{item}</span>
