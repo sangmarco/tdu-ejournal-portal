@@ -42,23 +42,16 @@ function flattenTranslations(obj: any, target: any, locale: Locale, prefix = '')
     const newKey = prefix ? `${prefix}.${key}` : key;
     if (value && typeof value === 'object' && !Array.isArray(value) && value[locale] !== undefined) {
       target[newKey] = value[locale];
+      target[key] = value[locale];
     } else if (value && typeof value === 'object' && !Array.isArray(value)) {
       flattenTranslations(value, target, locale, newKey);
     }
   }
 }
 
-// Initialize on module load
-initDict();
-
 // Helper to get nested translation
 export function getTranslation(locale: Locale, path: string): string {
-  const keys = path.split('.');
-  let result: any = dict[locale];
-  for (const key of keys) {
-    result = result?.[key];
-  }
-  return result || path;
+  return dict[locale][path] ?? path;
 }
 
 // Translation keys structure
@@ -106,6 +99,17 @@ export const translationKeys = {
     terms: { vi: 'Điều khoản', en: 'Terms' },
   },
   home: {
+    heroBadge: { vi: 'Tạp chí khoa học', en: 'Scientific journal' },
+    statIssues: { vi: 'Số tạp chí', en: 'Issues' },
+    statArticles: { vi: 'Bài báo', en: 'Articles' },
+    statAuthors: { vi: 'Tác giả', en: 'Authors' },
+    statYears: { vi: 'Năm xuất bản', en: 'Years of publication' },
+    noCurrentIssue: { vi: 'Chưa có số hiện tại.', en: 'No current issue available.' },
+    noArticles: { vi: 'Chưa có bài báo để hiển thị.', en: 'No articles available.' },
+    viewDetails: { vi: 'Xem chi tiết', en: 'View details' },
+    moreArticles: { vi: 'bài báo khác', en: 'more articles' },
+    ctaTitle: { vi: 'Gửi bài cho tạp chí', en: 'Submit to the journal' },
+    ctaDescription: { vi: 'Xem hướng dẫn dành cho tác giả trước khi gửi bản thảo.', en: 'Read the author guidelines before submitting your manuscript.' },
     heroTitle: {
       vi: 'Tạp Chí Khoa Học Trường Đại Học Thành Đông',
       en: 'Thanh Dong University Scientific Journal'
@@ -150,6 +154,8 @@ export const translationKeys = {
     step5: { vi: 'Bước 5: Hoàn tất', en: 'Step 5: Complete' },
   },
 } as const;
+
+initDict();
 
 export type TranslationKeys = typeof translationKeys;
 

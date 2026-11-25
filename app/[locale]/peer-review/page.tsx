@@ -16,6 +16,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PeerReviewPageProps): Promise<Metadata> {
   const { locale } = await params;
+  if (!locales.includes(locale)) notFound();
   const t = dict[locale];
   return {
     title: t.peerReviewTitle,
@@ -83,7 +84,7 @@ function ModelCard({ model, locale }: { model: typeof reviewModels[0]; locale: L
       </div>
       <p className="text-gray-600 mb-4">{t[model.descKey]}</p>
       <ul className="space-y-2">
-        {t[model.featuresKey].map((feature: string, i: number) => (
+        {t[model.featuresKey]?.map((feature: string, i: number) => (
           <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
             <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -193,7 +194,7 @@ export default async function PeerReviewPage({ params }: PeerReviewPageProps) {
           <Card className="p-6">
             <h3 className="font-semibold text-gray-900 mb-4">{t.reviewCriteria}</h3>
             <ul className="space-y-3">
-              {t.reviewCriteriaItems.map((item: string, i: number) => (
+              {t.reviewCriteriaItems?.map((item: string, i: number) => (
                 <li key={i} className="flex items-start gap-3 text-gray-700">
                   <span className="text-primary-600">→</span>
                   <span>{item}</span>
@@ -204,7 +205,7 @@ export default async function PeerReviewPage({ params }: PeerReviewPageProps) {
           <Card className="p-6">
             <h3 className="font-semibold text-gray-900 mb-4">{t.recommendationOptions}</h3>
             <ul className="space-y-3">
-              {t.recommendationItems.map((item: string, i: number) => (
+              {t.recommendationItems?.map((item: string, i: number) => (
                 <li key={i} className="flex items-start gap-3 text-gray-700">
                   <span className="text-primary-600">→</span>
                   <span>{item}</span>
@@ -220,7 +221,7 @@ export default async function PeerReviewPage({ params }: PeerReviewPageProps) {
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">{t.reviewEthics}</h2>
         <Card className="p-6 max-w-3xl mx-auto">
           <ul className="space-y-4">
-            {t.ethicsItems.map((item: string, i: number) => (
+            {t.ethicsItems?.map((item: string, i: number) => (
               <li key={i} className="flex items-start gap-3 text-gray-700">
                 <svg className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />

@@ -16,6 +16,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: OpenAccessPageProps): Promise<Metadata> {
   const { locale } = await params;
+  if (!locales.includes(locale)) notFound();
   const t = dict[locale];
   return {
     title: t.openAccessTitle,
@@ -87,13 +88,13 @@ export default async function OpenAccessPage({ params }: OpenAccessPageProps) {
           <div className="prose prose-gray max-w-none">
             <h4 className="font-semibold text-gray-900 mb-3">{t.licensePermissions}</h4>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
-              {t.licensePermissionsItems.map((item: string, i: number) => (
+              {t.licensePermissionsItems?.map((item: string, i: number) => (
                 <li key={i}>{item}</li>
               ))}
             </ul>
             <h4 className="font-semibold text-gray-900 mt-6 mb-3">{t.licenseRequirements}</h4>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
-              {t.licenseRequirementsItems.map((item: string, i: number) => (
+              {t.licenseRequirementsItems?.map((item: string, i: number) => (
                 <li key={i}>{item}</li>
               ))}
             </ul>
@@ -105,7 +106,7 @@ export default async function OpenAccessPage({ params }: OpenAccessPageProps) {
       <section className="mb-16">
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">{t.authorBenefits}</h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-5xl mx-auto">
-          {t.authorBenefitsItems.map((item: string, i: number) => (
+          {t.authorBenefitsItems?.map((item: string, i: number) => (
             <Card key={i} className="p-6">
               <div className="w-12 h-12 rounded-lg bg-primary-100 flex items-center justify-center text-2xl mb-4">
                 {['📈', '🌍', '🔗', '📚'][i]}
@@ -136,7 +137,7 @@ export default async function OpenAccessPage({ params }: OpenAccessPageProps) {
       <section>
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">{t.faq}</h2>
         <div className="max-w-3xl mx-auto space-y-4">
-          {t.faqItems.map((item: { q: string; a: string }, i: number) => (
+          {t.faqItems?.map((item: { q: string; a: string }, i: number) => (
             <Card key={i} className="p-6">
               <h3 className="font-semibold text-gray-900 mb-2">{item.q}</h3>
               <p className="text-gray-600">{item.a}</p>
