@@ -1,0 +1,9 @@
+# Architecture
+## Target vs implemented
+Target: modular monolith, Next.js server services and public frontend. JournalRegistry -> OjsRestClient -> IssueService -> ArticleService; OaiPmhClient -> MetadataMergeService; SearchService and bounded cache expose public DTOs. No separate microservices required now.
+Implemented in REST commit ee8960f: src/lib/ojs/publicModel.ts and multiJournal.ts, app/api/ojs/[...path]/route.ts, journal directory, journal page, issue page. Configured registry replaces unavailable contexts discovery. Existing legacy client uses proxy and still has status=7 display adapter. No OAI client or cross-journal search yet.
+## Data flow
+OJS /{journal}/api/v1/issues -> items/itemsMax -> published issue detail -> articles and sections -> exact current publication with status 3, submissionId and contextId matching -> public DTO. OAI /{journal}/oai?verb=ListRecords&metadataPrefix=oai_dc enriches missing abstract/keywords via verified identity, not title matching.
+Use composite keys journal path + issue/submission/section ID; verify journal ownership on all detail requests. Keep locale and version metadata. Match REST and OAI canonical public URLs and validated identifiers; do not guess a slug from numeric ID. OAI alone must not resurrect unpublished or deleted records. Fetch only configured upstream paths, prohibit arbitrary URLs, sanitize HTML, avoid XML external entities and DTDs, bound response sizes, pagination and concurrency.
+Public URLs must point to the approved browser-facing OJS base. Never expose workflow URLs or administrative data. No fake metadata, no automatic PDF links without verification. Current issue must be identified from verified upstream information, not inferred from newest publication.
+Cache is currently fetch revalidation=60 in REST implementation; verify behavior and decide TTL after tests. Separate source errors from empty collections and isolate journal failures in aggregate search.

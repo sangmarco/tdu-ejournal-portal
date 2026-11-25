@@ -1,0 +1,5 @@
+# Bối cảnh dự án
+Mục tiêu: cổng thông tin khoa học TDU, tổng hợp nhiều tạp chí trên một OJS 3.5.0.6. Độc giả tìm kiếm, xem số, đọc bài và trích dẫn tại Portal; tác giả, biên tập viên và phản biện làm việc trong OJS. Giữ Next.js App Router, TypeScript, React, giao diện VI/EN và tái sử dụng component hiện có.
+Nguồn yêu cầu: wireframe bốn trang do chủ dự án cung cấp (trang chủ tạp chí desktop, chi tiết bài báo, tìm kiếm, mobile); bảng API TEST 25/11/2026 và bản in OAI-PMH ListRecords do chủ dự án cung cấp. Các tài liệu nguồn riêng không được sao chép lên repository công khai; bản tóm tắt kỹ thuật đã loại dữ liệu riêng nằm trong docs. Khi cần XML gốc, hãy lấy trực tiếp trên OJS localhost.
+Phạm vi: Portal Level (danh mục, bài mới, tìm kiếm liên tạp chí), Journal Level (trang chủ, số mới, lưu trữ, mục lục, bài báo, thông báo, chính sách và gửi bài). Không xây dựng lại quy trình xuất bản, không ghi trực tiếp DB OJS.
+Hiện trạng: feature/multi-journal-ojs đã chứa REST mapping và một số route động; chưa hoàn thành Hybrid OAI, UI migration, kiểm thử và nghiệm thu. Xem HANDOFF và TEST_REPORT.
