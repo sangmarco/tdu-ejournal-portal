@@ -2,6 +2,21 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Configure the OJS journal in `.env.local` in this directory, then restart Next.js.
+Use the URL of the journal immediately before `/api/v1`. For example, a local
+OJS installation without URL rewriting might use the following settings:
+
+```dotenv
+OJS_BASE_URL=http://localhost/ojs/index.php/YOUR_JOURNAL_PATH
+OJS_JOURNAL_ID=1
+OJS_API_KEY=YOUR_SERVER_SIDE_TOKEN
+```
+
+Replace the example values with the journal's actual path, numeric context ID,
+and token. Browser requests go to `/api/ojs` on the frontend's origin. Next.js
+contacts OJS using its server environment. If Next.js runs in a container,
+use an OJS address reachable from inside that container.
+
 First, run the development server:
 
 ```bash

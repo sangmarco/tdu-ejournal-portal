@@ -14,12 +14,6 @@ import type {
   OJSLocale,
 } from './types';
 
-const OJS_BASE_URL = process.env.OJS_BASE_URL || 'http://localhost/ojs';
-const OJS_API_KEY = process.env.OJS_API_KEY || '';
-const OJS_API_VERSION = process.env.OJS_API_VERSION || 'v1';
-
-const API_BASE = `${OJS_BASE_URL}/api/${OJS_API_VERSION}`;
-
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
 }
@@ -42,15 +36,15 @@ function flattenParams(params: OJSSearchParams): Record<string, string | number 
 }
 
 function buildUrl(endpoint: string, params?: Record<string, unknown>): string {
-  const url = new URL(`${API_BASE}${endpoint}`);
+  const query = new URLSearchParams();
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        url.searchParams.append(key, String(value));
+        query.append(key, String(value));
       }
     });
   }
-  return url.toString();
+  return `/api/ojs${endpoint}${query.size ? `?${query}` : ''}`;
 }
 
 async function fetchWithAuth<T>(
@@ -60,9 +54,7 @@ async function fetchWithAuth<T>(
   const { params, headers, ...fetchOptions } = options;
 
   const defaultHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'Authorization': `Bearer ${OJS_API_KEY}`,
     ...headers,
   };
 
@@ -113,13 +105,7 @@ export async function getIssues(params?: OJSSearchParams): Promise<OJSPaginatedR
 }
 
 export async function getCurrentIssue(): Promise<OJSIssue | null> {
-  const journal = await getJournal();
-  if (journal.currentIssue) {
-    return journal.currentIssue;
-  }
-  // Fallback: get latest published issue
-  const issues = await getIssues({ filter: { published: 'true' }, sortField: 'year', sortDirection: 'desc', perPage: 1 });
-  return issues.data[0] || null;
+  return fetchWithAuth<OJSIssue | null>('/issues/current');
 }
 
 export async function getIssue(issueId: number): Promise<OJSIssue> {
