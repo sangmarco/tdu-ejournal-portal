@@ -52,6 +52,16 @@ export function safePublicUrl(path:string, value:string) {
     return new URL(relative, target).toString();
   } catch { return ''; }
 }
+export function safeCoverUrl(value: string) {
+  if (!value) return '';
+  try {
+    const upstream = new URL(base() + '/');
+    const url = new URL(value);
+    if (url.origin !== upstream.origin || url.username || url.password || url.search || url.hash) return '';
+    if (!/^\/.*\/public\/journals\/\d+\/[a-zA-Z0-9._-]+\.(?:jpe?g|png|webp)$/i.test(url.pathname)) return '';
+    return url.toString();
+  } catch { return ''; }
+}
 export async function issueList(path:string) {
   const result: NonNullable<ReturnType<typeof mapIssue>>[] = [];
   const seen = new Set<number>();
@@ -62,7 +72,13 @@ export async function issueList(path:string) {
     const items = rows(body.items);
     for (const raw of items) {
       const issue = mapIssue(raw,path);
-      if (issue && !seen.has(issue.id)) { seen.add(issue.id); result.push({...issue,publishedUrl:safePublicUrl(path,issue.publishedUrl)}); }
+      if (issue && !seen.has(issue.id)) {
+        seen.add(issue.id);
+        const cleanCovers = Object.fromEntries(
+          Object.entries(issue.coverUrl).map(([k, v]) => [k, safeCoverUrl(v)]).filter(([, v]) => Boolean(v))
+        );
+        result.push({...issue,publishedUrl:safePublicUrl(path,issue.publishedUrl),coverUrl:cleanCovers});
+      }
     }
     offset += items.length;
     if (offset >= (body.itemsMax as number)) return result;
@@ -77,7 +93,20 @@ export async function issueDetail(path:string, issueId:number) {
   const raw = await request(path,'issues/'+issueId);
   const issue = mapIssue(raw,path);
   if (!issue || issue.id !== issueId || issue.journalId !== listed.journalId) return null;
-  return {...issue,publishedUrl:safePublicUrl(path,issue.publishedUrl),articles:mapArticles(raw,path).map(a=>({...a,urlPublished:safePublicUrl(path,a.urlPublished)}))};
+  const cleanIssueCovers = Object.fromEntries(
+    Object.entries(issue.coverUrl).map(([k, v]) => [k, safeCoverUrl(v)]).filter(([, v]) => Boolean(v))
+  );
+  return {
+    ...issue,
+    publishedUrl:safePublicUrl(path,issue.publishedUrl),
+    coverUrl: cleanIssueCovers,
+    articles:mapArticles(raw,path).map(a=>{
+      const cleanArticleCovers = Object.fromEntries(
+        Object.entries(a.coverUrl).map(([k, v]) => [k, safeCoverUrl(v)]).filter(([, v]) => Boolean(v))
+      );
+      return {...a,urlPublished:safePublicUrl(path,a.urlPublished),coverUrl:cleanArticleCovers};
+    })
+  };
 }
 export async function issues(path:string,locale:string) {
   return (await issueList(path)).map(i=>({...i,title:label(i.title,locale),year:String(i.year)}));

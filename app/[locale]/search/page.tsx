@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
 import { journals, journalArticles } from '@/lib/ojs/multiJournal';
 import { label } from '@/lib/ojs/publicModel';
@@ -49,7 +50,31 @@ export default async function SearchPage({ params, searchParams }: { params: Pro
     {!!failed.length && <p role="alert" className="rounded border border-amber-300 p-4">{vi ? 'Kết quả chưa đầy đủ. Không thể tải các tạp chí:' : 'Results are incomplete. Unable to load journals:'} {failed.map(j => j.name).join(', ')}</p>}
     <p role="status">{matches.length} {vi ? 'kết quả trong dữ liệu công khai đã tải' : 'results in loaded public data'}</p>
     {!matches.length && <p>{vi ? 'Không tìm thấy bài báo phù hợp trong dữ liệu đã tải.' : 'No matching articles in the loaded data.'}</p>}
-    <div className="space-y-4">{matches.slice((page - 1) * 20, page * 20).map(a => <article key={`${a.journalPath}:${a.id}`} className="space-y-2 rounded border p-5"><Link href={`/${locale}/journals/${a.journalPath}`} className="text-sm text-blue-700 underline">{directory.find(j => j.path === a.journalPath)?.name || a.journalPath}</Link><h2 className="text-xl font-semibold"><Link href={`/${locale}/journals/${a.journalPath}/articles/${a.id}`} className="text-blue-700 hover:underline">{label(a.title, locale)}</Link></h2>{a.authorsString && <p>{a.authorsString}</p>}<p className="text-sm text-slate-600">{[label(a.sectionName, locale), a.language, a.datePublished].filter(Boolean).join(' · ')}</p></article>)}</div>
+    <div className="space-y-4">
+      {matches.slice((page - 1) * 20, page * 20).map(a => {
+        const articleCover = label(a.coverUrl, locale);
+        return (
+          <article key={`${a.journalPath}:${a.id}`} className="flex flex-col sm:flex-row gap-4 rounded border p-5">
+            {articleCover && (
+              <div className="shrink-0">
+                <img
+                  src={articleCover}
+                  alt=""
+                  className="h-28 w-auto max-w-[90px] rounded border object-cover shadow-2xs"
+                  loading="lazy"
+                />
+              </div>
+            )}
+            <div className="min-w-0 flex-1 space-y-2">
+              <Link href={`/${locale}/journals/${a.journalPath}`} className="text-sm text-[#205778] underline">{directory.find(j => j.path === a.journalPath)?.name || a.journalPath}</Link>
+              <h2 className="text-xl font-semibold"><Link href={`/${locale}/journals/${a.journalPath}/articles/${a.id}`} className="text-[#205778] hover:underline">{label(a.title, locale)}</Link></h2>
+              {a.authorsString && <p className="text-sm text-slate-700">{a.authorsString}</p>}
+              <p className="text-sm text-slate-600">{[label(a.sectionName, locale), a.language, a.datePublished].filter(Boolean).join(' · ')}</p>
+            </div>
+          </article>
+        );
+      })}
+    </div>
     {pages > 1 && <nav aria-label={vi ? 'Phân trang kết quả' : 'Search pagination'} className="flex flex-wrap gap-5">{page > 1 && <Link rel="prev" className="text-blue-700 underline" href={pageUrl(page - 1)}>{vi ? 'Trang trước' : 'Previous'}</Link>}<span>{vi ? 'Trang' : 'Page'} {page} / {pages}</span>{page < pages && <Link rel="next" className="text-blue-700 underline" href={pageUrl(page + 1)}>{vi ? 'Trang sau' : 'Next'}</Link>}</nav>}
   </section>;
 }

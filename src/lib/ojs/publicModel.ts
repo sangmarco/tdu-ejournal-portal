@@ -14,7 +14,7 @@ export function label(v: unknown, locale: string) {
 }
 export function mapIssue(item: Row, path: string) {
   if (!published(item.published) || !id(item.id) || !id(item.journalId)) return null;
-  return { id: item.id, journalId: item.journalId, journalPath: path, title: localized(item.title), description: localized(item.description), identification: str(item.identification), volume: String(item.volume ?? ''), number: String(item.number ?? ''), year: typeof item.year === 'number' ? item.year : 0, datePublished: str(item.datePublished), published: true, current: published(item.current), publishedUrl: str(item.publishedUrl), articles: [] };
+  return { id: item.id, journalId: item.journalId, journalPath: path, title: localized(item.title), description: localized(item.description), identification: str(item.identification), volume: String(item.volume ?? ''), number: String(item.number ?? ''), year: typeof item.year === 'number' ? item.year : 0, datePublished: str(item.datePublished), published: true, current: published(item.current), publishedUrl: str(item.publishedUrl), coverUrl: localized(item.coverUrl), articles: [] };
 }
 export function mapArticles(issue: Row, path: string) {
   if (!mapIssue(issue,path)) return [];
@@ -23,6 +23,6 @@ export function mapArticles(issue: Row, path: string) {
     const p = rows(a.publications).find(p => p.id === a.currentPublicationId && p.submissionId === a.id && p.status === 3);
     if (!p || !str(p.datePublished) || !str(p.urlPublished)) return [];
     const section = rows(issue.sections).find(s => s.id === p.sectionId && s.contextId === a.contextId);
-    return [{ id: a.id, publicationId: a.currentPublicationId, journalId: a.contextId, journalPath: path, issueId: issue.id, status: 3, title: localized(p.fullTitle ?? p.title), sectionId: p.sectionId, sectionName: localized(section?.title), authorsString: str(p.authorsStringIncludeInBrowse), datePublished: str(p.datePublished), language: str(p.locale) || str(a.locale), pages: str(p.pages), urlPublished: str(p.urlPublished), abstract: localized(p.abstract), authors: [], galleys: [], identifiers: [], categories: [] }];
+    return [{ id: a.id, publicationId: a.currentPublicationId, journalId: a.contextId, journalPath: path, issueId: issue.id, status: 3, title: localized(p.fullTitle ?? p.title), sectionId: p.sectionId, sectionName: localized(section?.title), authorsString: str(p.authorsStringIncludeInBrowse), datePublished: str(p.datePublished), language: str(p.locale) || str(a.locale), pages: str(p.pages), urlPublished: str(p.urlPublished), coverUrl: localized(p.coverUrl), abstract: localized(p.abstract), authors: [], galleys: [], identifiers: [], categories: [] }];
   });
 }

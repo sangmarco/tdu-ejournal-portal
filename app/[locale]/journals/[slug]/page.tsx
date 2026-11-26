@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { journals, issueList, journalArticles, publicJournalUrl } from '@/lib/ojs/multiJournal';
@@ -22,12 +23,59 @@ export default async function JournalPage({ params }: { params: Promise<{ locale
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
       <section id="issues" className="space-y-4"><h2 className="text-xl font-semibold">{vi ? 'Các số đã xuất bản' : 'Published issues'}</h2>
         {issueResult.status === 'rejected' ? <p role="alert">{vi ? 'Không thể tải số tạp chí.' : 'Unable to load issues.'}</p> : !issues.length ? <p>{vi ? 'Chưa có số đã xuất bản.' : 'No published issues.'}</p> : <>
-          {featured && <article className="space-y-3 rounded border bg-slate-50 p-5"><p className="text-sm font-semibold">{featured.current ? (vi ? 'Số hiện tại' : 'Current issue') : (vi ? 'Số xuất bản gần nhất' : 'Most recently published issue')}</p><h3 className="text-xl font-semibold">{issueName(featured)}</h3>{featured.datePublished && <p>{featured.datePublished}</p>}<Link className="text-blue-700 underline" href={`/${locale}/journals/${slug}/issues/${featured.id}`}>{vi ? 'Xem mục lục' : 'View contents'}</Link></article>}
+          {featured && (() => {
+            const issueCover = label(featured.coverUrl, locale);
+            return (
+              <article className="flex flex-col sm:flex-row gap-5 rounded border bg-slate-50 p-5">
+                {issueCover && (
+                  <div className="shrink-0">
+                    <img
+                      src={issueCover}
+                      alt=""
+                      className="h-44 w-auto max-w-[130px] rounded border object-cover shadow-2xs"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                <div className="space-y-3 min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-slate-700">
+                    {featured.current ? (vi ? 'Số hiện tại' : 'Current issue') : (vi ? 'Số xuất bản gần nhất' : 'Most recently published issue')}
+                  </p>
+                  <h3 className="text-xl font-semibold text-[#205778]">{issueName(featured)}</h3>
+                  {featured.datePublished && <p className="text-sm text-slate-600">{featured.datePublished}</p>}
+                  <Link className="inline-block text-[#205778] font-medium underline" href={`/${locale}/journals/${slug}/issues/${featured.id}`}>
+                    {vi ? 'Xem mục lục →' : 'View contents →'}
+                  </Link>
+                </div>
+              </article>
+            );
+          })()}
           <ul className="divide-y">{issues.filter(i => i.id !== featured?.id).map(i => <li key={i.id} className="py-3"><Link className="text-blue-700 underline" href={`/${locale}/journals/${slug}/issues/${i.id}`}>{issueName(i)}</Link></li>)}</ul>
         </>}
       </section>
       <section id="articles" className="space-y-4"><h2 className="text-xl font-semibold">{vi ? 'Bài báo mới' : 'Recent articles'}</h2>
-        {articleResult.status === 'rejected' ? <p role="alert">{vi ? 'Không thể tải bài báo.' : 'Unable to load articles.'}</p> : !articles.length ? <p>{vi ? 'Chưa có bài báo công khai.' : 'No public articles.'}</p> : articles.slice(0, 10).map(a => <article key={a.id} className="space-y-2 rounded border p-5"><p className="text-sm text-slate-600">{[label(a.sectionName, locale), a.language, a.datePublished].filter(Boolean).join(' · ')}</p><h3 className="text-lg font-semibold"><Link className="text-blue-700 hover:underline" href={`/${locale}/journals/${slug}/articles/${a.id}`}>{label(a.title, locale)}</Link></h3>{a.authorsString && <p>{a.authorsString}</p>}</article>)}
+        {articleResult.status === 'rejected' ? <p role="alert">{vi ? 'Không thể tải bài báo.' : 'Unable to load articles.'}</p> : !articles.length ? <p>{vi ? 'Chưa có bài báo công khai.' : 'No public articles.'}</p> : articles.slice(0, 10).map(a => {
+          const articleCover = label(a.coverUrl, locale);
+          return (
+            <article key={a.id} className="flex flex-col sm:flex-row gap-4 rounded border p-5">
+              {articleCover && (
+                <div className="shrink-0">
+                  <img
+                    src={articleCover}
+                    alt=""
+                    className="h-28 w-auto max-w-[90px] rounded border object-cover shadow-2xs"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+              <div className="min-w-0 flex-1 space-y-2">
+                <p className="text-sm text-slate-600">{[label(a.sectionName, locale), a.language, a.datePublished].filter(Boolean).join(' · ')}</p>
+                <h3 className="text-lg font-semibold"><Link className="text-[#205778] hover:underline" href={`/${locale}/journals/${slug}/articles/${a.id}`}>{label(a.title, locale)}</Link></h3>
+                {a.authorsString && <p className="text-sm text-slate-700">{a.authorsString}</p>}
+              </div>
+            </article>
+          );
+        })}
       </section>
     </div>
   </section>;

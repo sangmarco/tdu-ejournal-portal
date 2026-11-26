@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mapArticles, mapIssue } from './publicModel';
-import { safePublicUrl } from './multiJournal';
+import { safePublicUrl, safeCoverUrl } from './multiJournal';
 
 const publication = { id: 11, submissionId: 1, status: 3, datePublished: '2026-01-01', urlPublished: 'http://localhost/ojs/index.php/sample/article/view/custom', title: { en: 'Synthetic article' } };
 const submission = { id: 1, contextId: 7, currentPublicationId: 11, status: 3, publications: [publication] };
@@ -32,4 +32,20 @@ test('public links reject other contexts, workflows, query strings and credentia
     assert.equal(safePublicUrl('sample', `http://localhost/ojs/index.php/${path}`), '');
   }
   assert.equal(safePublicUrl('sample', 'http://user:pass@localhost/ojs/index.php/sample/article/view/1'), '');
+});
+
+test('cover URLs validate safe file formats and reject path traversal or foreign origins', () => {
+  process.env.OJS_BASE_URL = 'http://localhost/ojs/index.php';
+  assert.equal(safeCoverUrl('http://localhost/ojs/public/journals/1/cover_vi.jpg'), 'http://localhost/ojs/public/journals/1/cover_vi.jpg');
+  assert.equal(safeCoverUrl('http://localhost/ojs/public/journals/2/cover.png'), 'http://localhost/ojs/public/journals/2/cover.png');
+  assert.equal(safeCoverUrl('http://localhost/ojs/public/journals/2/cover.webp'), 'http://localhost/ojs/public/journals/2/cover.webp');
+  for (const bad of [
+    'http://localhost/ojs/public/journals/1/shell.php',
+    'http://localhost/ojs/public/journals/1/../secret.jpg',
+    'http://localhost/ojs/public/journals/1/cover.jpg?query=1',
+    'http://foreign.com/ojs/public/journals/1/cover.jpg',
+    'http://user:pass@localhost/ojs/public/journals/1/cover.jpg',
+  ]) {
+    assert.equal(safeCoverUrl(bad), '');
+  }
 });

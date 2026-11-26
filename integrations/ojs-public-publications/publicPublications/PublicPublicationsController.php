@@ -59,6 +59,16 @@ class PublicPublicationsController extends PKPBaseController
         $dto['year'] = (int) $dto['year'];
         $dto['current'] = (int) $c->getData('currentIssueId') === $dto['id'];
         $dto['publishedUrl'] = $this->readerUrl('issue', $i->getBestIssueId());
+        $cover = $i->getData('coverImage');
+        if (is_array($cover)) {
+            $coverUrl = [];
+            foreach ($cover as $loc => $file) {
+                if (is_string($file) && preg_match('/^[a-zA-Z0-9._-]+\.(jpe?g|png|webp)$/i', $file)) {
+                    $coverUrl[$loc] = $this->getRequest()->getBaseUrl() . '/public/journals/' . (int) $c->getId() . '/' . $file;
+                }
+            }
+            if (!empty($coverUrl)) $dto['coverUrl'] = $coverUrl;
+        }
         return $dto;
     }
     private function readerUrl(string $page, $id): string
@@ -108,6 +118,17 @@ class PublicPublicationsController extends PKPBaseController
             // Short public display only, never author objects/emails/affiliations.
             $pub['authorsStringIncludeInBrowse'] = $section->getData('hideAuthor') ? '' : $p->getAuthorString(new \ArrayIterator([]), true);
             $pub['urlPublished'] = $this->readerUrl('article', $s->getBestId());
+            $cover = $p->getData('coverImage');
+            if (is_array($cover)) {
+                $coverUrl = [];
+                foreach ($cover as $loc => $data) {
+                    $file = is_array($data) ? ($data['uploadName'] ?? null) : (is_string($data) ? $data : null);
+                    if (is_string($file) && preg_match('/^[a-zA-Z0-9._-]+\.(jpe?g|png|webp)$/i', $file)) {
+                        $coverUrl[$loc] = $this->getRequest()->getBaseUrl() . '/public/journals/' . $contextId . '/' . $file;
+                    }
+                }
+                if (!empty($coverUrl)) $pub['coverUrl'] = $coverUrl;
+            }
             $a['publications'] = [$pub];
             $dto['articles'][] = $a;
         }

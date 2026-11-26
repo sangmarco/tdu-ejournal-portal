@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { journals, journalArticles, issueDetail } from '@/lib/ojs/multiJournal';
@@ -30,11 +31,27 @@ export default async function ArticlePage({ params }: { params: Promise<{ locale
         {Object.values(article.abstract).some(Boolean) ? Object.entries(article.abstract).filter(([, text]) => text).map(([language, text]) => <p key={language} lang={language.replace('_', '-')} className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{text}</p>) : <p className="text-slate-600">{vi ? 'Nguồn công khai hiện chưa cung cấp tóm tắt.' : 'An abstract is not currently available from the public source.'}</p>}
         {!!article.oaiMetadata?.subjects.length && <div className="min-w-0"><h2 className="text-xl font-semibold">{vi ? 'Từ khóa' : 'Keywords'}</h2><ul className="flex flex-wrap gap-2">{article.oaiMetadata.subjects.map((subject, index) => <li key={index} lang={subject.lang?.replace('_', '-')} className="max-w-full break-words rounded bg-slate-100 px-3 py-1 [overflow-wrap:anywhere]">{subject.value}</li>)}</ul></div>}
       </section>
-      <aside className="min-w-0 rounded border bg-slate-50 p-5"><h2 className="mb-4 text-xl font-semibold">{vi ? 'Thông tin bài báo' : 'Article information'}</h2><dl className="space-y-3">
-        {article.datePublished && <div><dt className="font-medium">{vi ? 'Ngày xuất bản' : 'Published'}</dt><dd>{article.datePublished}</dd></div>}
-        {article.language && <div><dt className="font-medium">{vi ? 'Ngôn ngữ' : 'Language'}</dt><dd>{article.language}</dd></div>}
-        {article.pages && <div><dt className="font-medium">{vi ? 'Trang' : 'Pages'}</dt><dd>{article.pages}</dd></div>}
-      </dl></aside>
+      <aside className="min-w-0 rounded border bg-slate-50 p-5 space-y-5">
+        {label(article.coverUrl, locale) && (
+          <div>
+            <img
+              src={label(article.coverUrl, locale)}
+              alt=""
+              className="w-full max-w-[200px] h-auto rounded border object-cover shadow-xs mx-auto"
+              loading="lazy"
+            />
+          </div>
+        )}
+        <div>
+          <h2 className="mb-4 text-xl font-semibold text-slate-900">{vi ? 'Thông tin bài báo' : 'Article information'}</h2>
+          <dl className="space-y-3 text-sm">
+            {article.datePublished && <div><dt className="font-medium text-slate-700">{vi ? 'Ngày xuất bản' : 'Published'}</dt><dd className="text-slate-600">{article.datePublished}</dd></div>}
+            {article.language && <div><dt className="font-medium text-slate-700">{vi ? 'Ngôn ngữ' : 'Language'}</dt><dd className="text-slate-600">{article.language}</dd></div>}
+            {article.pages && <div><dt className="font-medium text-slate-700">{vi ? 'Trang' : 'Pages'}</dt><dd className="text-slate-600">{article.pages}</dd></div>}
+            {issue && <div><dt className="font-medium text-slate-700">{vi ? 'Số tạp chí' : 'Issue'}</dt><dd className="text-slate-600"><Link href={`/${locale}/journals/${slug}/issues/${issue.id}`} className="text-[#205778] underline">{issue.identification || label(issue.title, locale)}</Link></dd></div>}
+          </dl>
+        </div>
+      </aside>
     </div>
   </article>;
 }

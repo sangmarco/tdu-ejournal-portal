@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
 import { journals, journalArticles } from '@/lib/ojs/multiJournal';
 import { label } from '@/lib/ojs/publicModel';
@@ -36,11 +37,28 @@ export default async function PortalContent({ locale }: { locale: string }) {
       <h2 id="recent-articles" className="text-2xl font-semibold">{vi ? 'Bài báo mới xuất bản' : 'Recently published articles'}</h2>
       {failed.length > 0 && <p role="alert">{vi ? 'Chưa tải được dữ liệu từ: ' : 'Unable to load data from: '}{failed.join(', ')}. {vi ? 'Vui lòng thử lại sau.' : 'Please try again later.'}</p>}
       {!articles.length && !failed.length && <p>{vi ? 'Chưa có bài báo công khai.' : 'No public articles.'}</p>}
-      {articles.slice(0, 12).map(a => <article key={`${a.journalPath}:${a.id}`} className="space-y-2 rounded border p-5">
-        <p className="text-sm text-gray-600">{a.journalPath} · {a.datePublished}</p>
-        <h3 className="text-lg font-semibold"><Link href={`/${locale}/journals/${a.journalPath}/articles/${a.id}`} className="text-[#205778] underline">{label(a.title, locale)}</Link></h3>
-        {a.authorsString && <p>{a.authorsString}</p>}
-      </article>)}
+      {articles.slice(0, 12).map(a => {
+        const cover = label(a.coverUrl, locale);
+        return (
+          <article key={`${a.journalPath}:${a.id}`} className="flex flex-col sm:flex-row gap-4 rounded border p-5">
+            {cover && (
+              <div className="shrink-0">
+                <img
+                  src={cover}
+                  alt=""
+                  className="h-24 w-auto max-w-[80px] rounded border object-cover shadow-2xs"
+                  loading="lazy"
+                />
+              </div>
+            )}
+            <div className="min-w-0 flex-1 space-y-2">
+              <p className="text-sm text-gray-600">{a.journalPath} · {a.datePublished}</p>
+              <h3 className="text-lg font-semibold"><Link href={`/${locale}/journals/${a.journalPath}/articles/${a.id}`} className="text-[#205778] underline">{label(a.title, locale)}</Link></h3>
+              {a.authorsString && <p className="text-sm text-slate-700">{a.authorsString}</p>}
+            </div>
+          </article>
+        );
+      })}
       <Link href={`/${locale}/search`} className="text-[#205778] underline">{vi ? 'Tìm kiếm liên tạp chí' : 'Search across journals'}</Link>
     </section>
   </section>;
