@@ -8,8 +8,6 @@ import type {
   OJSArticle,
   OJSSection,
   OJSCategory,
-  OJSUser,
-  OJSPaginatedResponse,
   OJSSearchParams,
 } from '@/lib/ojs';
 import {
@@ -26,6 +24,40 @@ import {
   searchArticles,
   getSupportedLocales,
 } from '@/lib/ojs';
+
+// Keep loading derived from the request identity so effects only publish async results.
+function useRequest<T>(request: () => Promise<T>, enabled = true) {
+  const [revision, setRevision] = useState(0);
+  const [result, setResult] = useState<{
+    request: () => Promise<T>;
+    revision: number;
+    data: T | null;
+    error: Error | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!enabled) return;
+    let active = true;
+    request().then(
+      data => {
+        if (active) setResult({ request, revision, data, error: null });
+      },
+      error => {
+        if (active) setResult({ request, revision, data: null, error: error instanceof Error ? error : new Error(String(error)) });
+      },
+    );
+    return () => { active = false; };
+  }, [request, revision, enabled]);
+
+  const refetch = useCallback(() => setRevision(value => value + 1), []);
+  const current = result?.request === request && result.revision === revision;
+  return {
+    data: enabled ? result?.data ?? null : null,
+    loading: enabled && !current,
+    error: current ? result.error : null,
+    refetch,
+  };
+}
 
 // ==================== Journal Hook ====================
 
@@ -60,27 +92,9 @@ export function useSupportedLocales() {
 // ==================== Issues Hooks ====================
 
 export function useIssues(params?: OJSSearchParams) {
-  const [issues, setIssues] = useState<OJSPaginatedResponse<OJSIssue> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchIssues = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getIssues(params);
-      setIssues(data);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [params]);
-
-  useEffect(() => {
-    fetchIssues();
-  }, [fetchIssues]);
-
-  return { issues, loading, error, refetch: fetchIssues };
+  const request = useCallback(() => getIssues(params), [params]);
+  const { data: issues, ...state } = useRequest(request);
+  return { issues, ...state };
 }
 
 export function useCurrentIssue() {
@@ -131,54 +145,17 @@ export function useIssue(issueId: number) {
 }
 
 export function useIssueArticles(issueId: number, params?: OJSSearchParams) {
-  const [articles, setArticles] = useState<OJSPaginatedResponse<OJSArticle> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchArticles = useCallback(async () => {
-    if (!issueId) return;
-    setLoading(true);
-    try {
-      const data = await getIssueArticles(issueId, params);
-      setArticles(data);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [issueId, params]);
-
-  useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
-
-  return { articles, loading, error, refetch: fetchArticles };
+  const request = useCallback(() => getIssueArticles(issueId, params), [issueId, params]);
+  const { data: articles, ...state } = useRequest(request, Boolean(issueId));
+  return { articles, ...state };
 }
 
 // ==================== Articles Hooks ====================
 
 export function usePublishedArticles(params?: OJSSearchParams) {
-  const [articles, setArticles] = useState<OJSPaginatedResponse<OJSArticle> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchArticles = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getPublishedArticles(params);
-      setArticles(data);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [params]);
-
-  useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
-
-  return { articles, loading, error, refetch: fetchArticles };
+  const request = useCallback(() => getPublishedArticles(params), [params]);
+  const { data: articles, ...state } = useRequest(request);
+  return { articles, ...state };
 }
 
 export function useArticle(articleId: number) {
@@ -206,30 +183,8 @@ export function useArticle(articleId: number) {
 }
 
 export function useArticleSearch(query: string, params?: OJSSearchParams) {
-  const [articles, setArticles] = useState<OJSPaginatedResponse<OJSArticle> | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    if (!query.trim()) {
-      setArticles(null);
-      return;
-    }
-    let mounted = true;
-    setLoading(true);
-    searchArticles(query, params)
-      .then(data => {
-        if (mounted) setArticles(data);
-      })
-      .catch((err: Error) => {
-        if (mounted) setError(err);
-      })
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
-    return () => { mounted = false; };
-  }, [query, params]);
-
+  const request = useCallback(() => searchArticles(query, params), [query, params]);
+  const { data: articles, loading, error } = useRequest(request, Boolean(query.trim()));
   return { articles, loading, error };
 }
 
@@ -284,25 +239,7 @@ export function useCategories() {
 // ==================== Users ====================
 
 export function useUsers(params?: OJSSearchParams) {
-  const [users, setUsers] = useState<OJSPaginatedResponse<OJSUser> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getUsers(params);
-      setUsers(data);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [params]);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
-  return { users, loading, error, refetch: fetchUsers };
+  const request = useCallback(() => getUsers(params), [params]);
+  const { data: users, ...state } = useRequest(request);
+  return { users, ...state };
 }

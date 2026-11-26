@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { Locale, dict } from '@/lib/i18n';
-import { useArticle, useJournal } from '@/hooks/useOJS';
+import { useArticle } from '@/hooks/useOJS';
+import type { OJSAuthor, OJSGalley } from '@/lib/ojs';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { formatArticleCitation, getArticleStatusLabel, getLocalizedValue } from '@/lib/ojs/client';
 
-function AuthorList({ authors, locale }: { authors: any[]; locale: Locale }) {
+function AuthorList({ authors, locale }: { authors: OJSAuthor[]; locale: Locale }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {authors
@@ -36,7 +37,7 @@ function AuthorList({ authors, locale }: { authors: any[]; locale: Locale }) {
   );
 }
 
-function GalleyLinks({ galleys, locale }: { galleys: any[]; locale: Locale }) {
+function GalleyLinks({ galleys, locale }: { galleys: OJSGalley[]; locale: Locale }) {
   const pdfGalley = galleys?.find((g) => g.file?.mimeType === 'application/pdf');
   const htmlGalley = galleys?.find((g) => g.html);
   const xmlGalley = galleys?.find((g) => g.file?.mimeType?.includes('xml'));
@@ -86,7 +87,6 @@ function GalleyLinks({ galleys, locale }: { galleys: any[]; locale: Locale }) {
 
 export default function ArticleContent({ locale, articleId }: { locale: Locale; articleId: number }) {
   const { article, loading, error } = useArticle(articleId);
-  const { journal } = useJournal();
   const t = dict[locale];
 
   if (loading) {

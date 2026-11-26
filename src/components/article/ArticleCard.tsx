@@ -2,9 +2,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent, CardFooter } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { formatArticleCitation, getArticleStatusLabel, getArticleStatusColor, getLocalizedValue } from '@/lib/ojs';
+import { getArticleStatusLabel, getArticleStatusColor, getLocalizedValue } from '@/lib/ojs';
 import { t } from '@/lib/i18n';
 import type { OJSArticle } from '@/lib/ojs';
 
@@ -15,7 +16,7 @@ interface ArticleCardProps {
   showJournal?: boolean;
 }
 
-export function ArticleCard({ article, locale, variant = 'default', showJournal = false }: ArticleCardProps) {
+export function ArticleCard({ article, locale, variant = 'default' }: ArticleCardProps) {
   const currentLocale = locale as 'vi' | 'en';
   const title = getLocalizedValue(article.title, currentLocale);
   const abstract = getLocalizedValue(article.abstract, currentLocale);
@@ -57,7 +58,7 @@ export function ArticleCard({ article, locale, variant = 'default', showJournal 
         <Link href={`/${currentLocale}/articles/${article.id}`} className="block">
           <div className="aspect-video relative overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
             {article.galleys?.[0]?.file?.downloadUrl && (
-              <img
+              <Image fill unoptimized
                 src={article.galleys[0].file.downloadUrl}
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"

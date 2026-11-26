@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { journals, issueDetail } from '@/lib/ojs/multiJournal';
 import { label } from '@/lib/ojs/publicModel';
-export const dynamic = 'force-dynamic';
 export default async function Page({params}:{params:Promise<{locale:string;slug:string;id:string}>}) {
   const {locale,slug,id}=await params;
   const vi=locale==='vi';
@@ -18,7 +17,7 @@ export default async function Page({params}:{params:Promise<{locale:string;slug:
     {issue.articles.length===0 && <p>{vi?'Chưa có bài báo công khai.':'No public articles.'}</p>}
     {issue.articles.map(a=><article key={a.id} className="space-y-2 rounded border p-5">
       <p className="text-sm text-gray-500">{label(a.sectionName,locale)} · {a.language} · {a.datePublished}</p>
-      <h3 className="text-lg font-semibold">{label(a.title,locale)}</h3><p>{a.authorsString}</p>
+      <h3 className="text-lg font-semibold"><Link className="text-blue-700 underline" href={`/${locale}/journals/${slug}/articles/${a.id}`}>{label(a.title,locale)}</Link></h3><p>{a.authorsString}</p>
       {a.urlPublished && <a href={a.urlPublished} className="text-blue-700 underline">{vi?'Đọc bài trên OJS':'Read on OJS'}</a>}
     </article>)}
   </section>;

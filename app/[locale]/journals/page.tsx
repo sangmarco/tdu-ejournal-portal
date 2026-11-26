@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { journals } from '@/lib/ojs/multiJournal';
 
-export const dynamic = 'force-dynamic';
 export default async function JournalsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const vi = locale === 'vi';

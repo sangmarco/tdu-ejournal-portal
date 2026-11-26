@@ -1,135 +1,34 @@
-// Header Component
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
-import { locales, defaultLocale, localeNames } from '@/lib/i18n';
-import { t } from '@/lib/i18n';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
-interface HeaderProps {
-  locale: string;
-}
-
-export function Header({ locale }: HeaderProps) {
+export function Header({ locale }: { locale: string }) {
   const pathname = usePathname();
-  const currentLocale = locale as 'vi' | 'en';
-
-  const navItems = [
-    { href: '/', label: t('common', 'home', currentLocale) },
-    { href: '/journals', label: currentLocale === 'vi' ? 'Tạp chí' : 'Journals' },
-    { href: '/about', label: t('common', 'about', currentLocale) },
-    { href: '/current-issue', label: t('common', 'currentIssue', currentLocale) },
-    { href: '/archives', label: t('common', 'archives', currentLocale) },
-    { href: '/submissions', label: t('common', 'submissions', currentLocale) },
-    { href: '/authors', label: t('common', 'authors', currentLocale) },
-    { href: '/reviewers', label: t('common', 'reviewers', currentLocale) },
-    { href: '/editors', label: t('common', 'editors', currentLocale) },
-    { href: '/contact', label: t('common', 'contact', currentLocale) },
+  const searchParams = useSearchParams();
+  const [openPath, setOpenPath] = useState<string | null>(null);
+  const open = openPath === pathname;
+  const vi = locale === 'vi';
+  const other = vi ? 'en' : 'vi';
+  const suffix = searchParams.toString();
+  const languageHref = pathname.replace(/^\/(vi|en)(?=\/|$)/, `/${other}`) + (suffix ? `?${suffix}` : '');
+  const links = [
+    { href: `/${locale}`, label: vi ? 'Trang chủ' : 'Home' },
+    { href: `/${locale}/journals`, label: vi ? 'Tạp chí' : 'Journals' },
+    { href: `/${locale}/search`, label: vi ? 'Tìm kiếm' : 'Search' },
   ];
-
-  return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 supports-[backdrop-filter]:dark:bg-gray-950/80">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo & Journal Name */}
-          <Link href={`/${currentLocale}`} className="flex items-center gap-3" aria-label="TDU eJournal Portal Home">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
-              <span className="text-white font-bold text-lg">TDU</span>
-            </div>
-            <div className="hidden sm:block">
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight">
-                Tạp Chí Khoa Học
-              </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Trường Đại Học Thành Đông</p>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-            {navItems.map((item) => {
-              const href = `/${currentLocale}${item.href === '/' ? '' : item.href}`;
-              const isActive = pathname === href || (item.href !== '/' && pathname.startsWith(href + '/'));
-              return (
-                <Link
-                  key={item.href}
-                  href={href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800'
-                  }`}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Right Side: Language Switcher + Submit Button */}
-          <div className="flex items-center gap-4">
-            {/* Language Switcher */}
-            <div className="relative" role="group" aria-label="Language selection">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1.5 px-2 py-1.5"
-                aria-haspopup="listbox"
-                aria-expanded="false"
-              >
-                <span className="text-sm font-medium capitalize">{currentLocale}</span>
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </Button>
-              {/* In a real implementation, this would be a dropdown with locale options */}
-            </div>
-
-            {/* Submit Article Button */}
-            <Link href={`/${currentLocale}/submissions`}>
-              <Button size="sm" className="hidden sm:inline-flex">
-                {t('common', 'submitArticle', currentLocale)}
-              </Button>
-            </Link>
-
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-              aria-label="Toggle menu"
-              aria-expanded="false"
-            >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
+  const navigation = links.map(link => <Link key={link.href} href={link.href} onClick={() => setOpenPath(null)} aria-current={pathname === link.href ? 'page' : undefined} className="rounded px-3 py-2 hover:bg-slate-100 aria-[current=page]:bg-slate-100">{link.label}</Link>);
+  return <header className="border-b bg-white text-[#172B3B]">
+    <a href="#main-content" className="sr-only focus:not-sr-only">{vi ? 'Đến nội dung chính' : 'Skip to content'}</a>
+    <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4">
+      <Link href={`/${locale}`} className="font-bold text-[#205778]">TDU <span className="hidden sm:inline">eJournal Portal</span></Link>
+      <nav aria-label={vi ? 'Điều hướng chính' : 'Main navigation'} className="hidden gap-2 md:flex">{navigation}</nav>
+      <div className="flex items-center gap-3">
+        <Link href={languageHref} hrefLang={other} lang={other} aria-label={vi ? 'Switch to English' : 'Chuyển sang tiếng Việt'} className="rounded border px-3 py-2">{other.toUpperCase()}</Link>
+        <button type="button" className="rounded border px-3 py-2 md:hidden" aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpenPath(open ? null : pathname)}>{vi ? 'Danh mục' : 'Menu'}</button>
       </div>
-
-      {/* Mobile Navigation (simplified - would need state management for full implementation) */}
-      <div className="md:hidden border-t border-gray-200 dark:border-gray-800 py-4">
-        <nav className="flex flex-col gap-2" aria-label="Mobile navigation">
-          {navItems.map((item) => {
-            const href = `/${currentLocale}${item.href === '/' ? '' : item.href}`;
-            const isActive = pathname === href || (item.href !== '/' && pathname.startsWith(href + '/'));
-            return (
-              <Link
-                key={item.href}
-                href={href}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive
-                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800'
-                }`}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-    </header>
-  );
+    </div>
+    <nav id="mobile-navigation" hidden={!open} aria-label={vi ? 'Điều hướng di động' : 'Mobile navigation'} className="border-t px-4 py-3 md:hidden"><div className="flex flex-col">{navigation}</div></nav>
+  </header>;
 }

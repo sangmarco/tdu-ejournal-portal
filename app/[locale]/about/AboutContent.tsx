@@ -1,16 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import type { OJSJournal, OJSLocalizedField } from '@/lib/ojs';
+
+type JournalInfoData = OJSJournal & { frequency?: OJSLocalizedField };
 import { Locale, dict } from '@/lib/i18n';
 import { useJournal, useUsers } from '@/hooks/useOJS';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 
 const usersParams = { filter: { role: 'editor' }, perPage: 5 } as const;
 
-function ScopeSection({ locale, journal }: { locale: Locale; journal: any }) {
+function ScopeSection({ locale, journal }: { locale: Locale; journal: JournalInfoData | null }) {
   const t = dict[locale];
   return (
     <section className="mb-12">
@@ -22,7 +23,7 @@ function ScopeSection({ locale, journal }: { locale: Locale; journal: any }) {
         <div className="mt-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">{t.categories}</h3>
           <div className="flex flex-wrap gap-2">
-            {journal.categories.map((cat: any) => (
+            {journal.categories.map((cat) => (
               <Badge key={cat.id} variant="outline">
                 {cat.name?.[locale] || cat.name?.vi}
               </Badge>
@@ -34,7 +35,7 @@ function ScopeSection({ locale, journal }: { locale: Locale; journal: any }) {
   );
 }
 
-function EditorialBoardPreview({ locale, journal }: { locale: Locale; journal: any }) {
+function EditorialBoardPreview({ locale }: { locale: Locale }) {
   const t = dict[locale];
   const { users, loading } = useUsers(usersParams);
 
@@ -60,8 +61,8 @@ function EditorialBoardPreview({ locale, journal }: { locale: Locale; journal: a
     );
   }
 
-  const editors = users?.data?.filter((u: any) =>
-    u.roles?.some((r: any) => r.name?.[locale]?.includes('Editor') || r.name?.vi?.includes('Editor'))
+  const editors = users?.data?.filter((u) =>
+    u.roles?.some((r) => r.name?.[locale]?.includes('Editor') || r.name?.vi?.includes('Editor'))
   ) || [];
 
   if (editors.length === 0) return null;
@@ -75,7 +76,7 @@ function EditorialBoardPreview({ locale, journal }: { locale: Locale; journal: a
         </Link>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {editors.slice(0, 6).map((editor: any) => (
+        {editors.slice(0, 6).map((editor) => (
           <Card key={editor.id} className="p-4 text-center">
             <div className="w-20 h-20 rounded-full bg-gray-200 mx-auto mb-3 flex items-center justify-center text-2xl">
               {editor.firstName?.[locale]?.charAt(0) || 'E'}{editor.lastName?.[locale]?.charAt(0) || 'D'}
@@ -96,7 +97,7 @@ function EditorialBoardPreview({ locale, journal }: { locale: Locale; journal: a
   );
 }
 
-function JournalInfo({ locale, journal }: { locale: Locale; journal: any }) {
+function JournalInfo({ locale, journal }: { locale: Locale; journal: JournalInfoData | null }) {
   const t = dict[locale];
   const info = [
     { label: t.publisher, value: journal?.publisher?.[locale] || journal?.publisher?.vi },
@@ -173,7 +174,7 @@ export default function AboutContent({ locale }: { locale: Locale }) {
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-12">
           <ScopeSection locale={locale} journal={journal} />
-          <EditorialBoardPreview locale={locale} journal={journal} />
+          <EditorialBoardPreview locale={locale} />
         </div>
 
         <aside className="lg:col-span-1">

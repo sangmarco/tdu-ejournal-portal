@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Locale, locales, dict } from '@/lib/i18n';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 
 interface CopyrightPageProps {
@@ -91,7 +90,7 @@ export default async function CopyrightPage({ params }: CopyrightPageProps) {
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">{t.creativeCommonsLicenses}</h2>
         <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">{t.ccLicensesDesc}</p>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
-          {t.ccLicenses?.map((license: { id: string; name: string; desc: string; permissions: string[] }, i: number) => (
+          {t.ccLicenses?.map((license: { id: string; name: string; desc: string; permissions: string[] }) => (
             <Card key={license.id} className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Badge variant={license.id === 'CC BY 4.0' ? 'success' : 'outline'}>{license.name}</Badge>
