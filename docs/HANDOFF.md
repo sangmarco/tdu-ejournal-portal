@@ -1,6 +1,31 @@
 # Bắt đầu tại đây — bàn giao cho phiên tiếp theo
 
-## Dọn dẹp trang và hook cũ, chuẩn hóa trang thông tin và tối ưu hóa build (2026-11-26; mới nhất)
+## Tích hợp và hiển thị ảnh bìa (Cover Images) cho Số và Bài báo từ OJS (2026-11-26; mới nhất)
+- **ĐÃ TRIỂN KHAI VÀ XÁC MINH TOÀN DIỆN**:
+  - **Trích xuất ảnh bìa an toàn từ OJS 3.5.0.6**:
+    - Số tạp chí (Issue): lấy trường `coverImage` (ví dụ `cover_issue_2_vi.jpg`), xác thực định dạng an toàn (jpg, png, webp), chiếu thành `coverUrl` công khai dạng `http://localhost/ojs/public/journals/{contextId}/{filename}`.
+    - Bài báo (Publication): lấy trường `coverImage` (ví dụ `submission_2_2_coverImage_en.png`, `submission_1_1_coverImage_vi.jpg`), xác thực tên tệp an toàn và chiếu thành `coverUrl` công khai.
+    - Cập nhật đồng bộ trong `integrations/ojs-public-publications/publicPublications/PublicPublicationsController.php` và plugin thực tế tại `C:\xampp\htdocs\ojs\plugins\generic\publicPublications`.
+  - **Tầng dữ liệu an toàn Next.js**:
+    - `src/lib/ojs/publicModel.ts`: bổ sung trường `coverUrl` vào kết quả của `mapIssue` và `mapArticles`.
+    - `src/lib/ojs/multiJournal.ts`: bổ sung hàm bảo mật `safeCoverUrl` kiểm tra nguồn gốc OJS base URL, mẫu đường dẫn `/public/journals/\d+/...`, đuôi tệp hợp lệ, từ chối mọi kỹ thuật path traversal (`..`) hoặc tham số giả mạo.
+    - `src/lib/ojs/publicModel.test.ts`: bổ sung ca kiểm thử bảo mật `safeCoverUrl` (nâng tổng số kiểm thử đơn vị lên 20/20 ĐẠT).
+  - **Hiển thị giao diện người dùng đồng bộ (Responsive UI Covers)**:
+    - Trang chủ (`app/[locale]/PortalContent.tsx`): hiển thị thumbnail ảnh bìa bài báo mới nhất.
+    - Danh mục chuyên san (`app/[locale]/journals/[slug]/page.tsx`): hiển thị ảnh bìa nổi bật của Số hiện tại / số mới nhất và thumbnail cho danh sách bài báo.
+    - Mục lục số báo (`app/[locale]/journals/[slug]/issues/[id]/page.tsx`): hiển thị ảnh bìa số báo kích thước đầy đủ kèm chi tiết phát hành, và thumbnail cho từng bài viết.
+    - Chi tiết bài báo (`app/[locale]/journals/[slug]/articles/[id]/page.tsx`): hiển thị ảnh bìa bài báo trong cột thông tin bên cạnh (aside), tự động co giãn theo tỷ lệ ảnh.
+    - Tìm kiếm liên tạp chí (`app/[locale]/search/page.tsx`): hiển thị thumbnail ảnh bìa trong danh sách kết quả tìm kiếm.
+    - Toàn bộ ảnh dùng `loading="lazy"` chuẩn mực, không gây tràn màn hình 375px.
+- **Kết quả kiểm thử toàn diện**:
+  - `scripts/browser-acceptance.cjs`: **ĐẠT 88/88 nhóm** trên cả 4 khung nhìn 1440/1024/768/375px với bản build production thực tế trên cổng 3101 (0 lỗi).
+  - `npm test`: **ĐẠT 20/20** (100% kiểm thử đơn vị).
+  - `php integrations/ojs-public-publications/tests/visibility.php`: **ĐẠT 29/29** khẳng định.
+  - `npx tsc --noEmit`: **ĐẠT** (0 lỗi TypeScript).
+  - `npm run lint`: **ĐẠT** (0 cảnh báo, 0 lỗi).
+  - `npm run build`: **ĐẠT** (63 trang tĩnh Turbopack chỉ trong 1.6s).
+
+## Dọn dẹp trang và hook cũ, chuẩn hóa trang thông tin và tối ưu hóa build (2026-11-26)
 - **ĐÃ HOÀN TẤT DỌN DẸP & TỐI ƯU**:
   - Đã xóa mã chết `app/[locale]/HomeContent.tsx` không còn sử dụng.
   - Chuyển hướng an toàn (Graceful Redirects) cho các tuyến đơn tạp chí cũ để tương thích ngược hoàn toàn và bảo đảm cấu trúc đa tạp chí chuẩn:

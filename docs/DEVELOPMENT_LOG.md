@@ -1,5 +1,27 @@
 # Nhật ký phát triển
 
+## 2026-11-26 — tích hợp và hiển thị ảnh bìa (Cover Images) cho Số và Bài báo từ OJS
+- Khảo sát thực địa dữ liệu tệp ảnh bìa trong OJS 3.5.0.6:
+  - Bảng dữ liệu số báo có `coverImage` trỏ tới tệp trong thư mục `public/journals/{contextId}/` (ví dụ `cover_issue_2_vi.jpg` tại tạp chí 2).
+  - Bảng dữ liệu bài báo `publication` có `coverImage` dạng mảng cấu trúc chứa `uploadName` (ví dụ `submission_2_2_coverImage_en.png`, `submission_1_1_coverImage_vi.jpg`).
+- Nâng cấp Controller OJS (`PublicPublicationsController.php`):
+  - Phương thức `issueDto()`: Kiểm tra sự tồn tại và định dạng an toàn của tệp ảnh bìa (jpg, png, webp), chiếu trường `coverUrl` công khai.
+  - Vòng lặp bài báo: Lấy `coverImage` của `currentPublication`, trích xuất `uploadName`, kiểm tra an toàn và chiếu trường `coverUrl`.
+  - Triển khai và kiểm tra curl thực tế trên OJS đang chạy: cả hai endpoint `issues` và `issues/{id}` đều trả về `coverUrl` chính xác.
+- Bảo mật tầng dữ liệu cổng thông tin:
+  - Cập nhật `src/lib/ojs/publicModel.ts`: Thêm `coverUrl: localized(...)` vào kết quả `mapIssue` và `mapArticles`.
+  - Cập nhật `src/lib/ojs/multiJournal.ts`: Thêm hàm thẩm định `safeCoverUrl` nhằm đảm bảo URL ảnh bìa phải có cùng origin với OJS, đường dẫn thuộc `/public/journals/\d+/...`, định dạng tệp hình ảnh hợp lệ, không có query/hash, loại trừ triệt để path traversal.
+  - Cập nhật `src/lib/ojs/publicModel.test.ts`: Bổ sung kiểm thử đơn vị cho `safeCoverUrl` (nâng tổng số lên 20/20 kiểm thử).
+- Hoàn thiện giao diện hiển thị ảnh bìa (Responsive Cover UI):
+  - Trang chủ (`app/[locale]/PortalContent.tsx`): hiển thị thumbnail ảnh bài báo mới.
+  - Chuyên san (`app/[locale]/journals/[slug]/page.tsx`): hiển thị bìa số nổi bật và thumbnail bài báo.
+  - Mục lục số (`app/[locale]/journals/[slug]/issues/[id]/page.tsx`): hiển thị ảnh bìa số báo lớn và thumbnail bài viết.
+  - Chi tiết bài báo (`app/[locale]/journals/[slug]/articles/[id]/page.tsx`): hiển thị ảnh bìa trong cột thông tin bổ trợ bên phải.
+  - Tìm kiếm (`app/[locale]/search/page.tsx`): hiển thị thumbnail bài báo trong danh sách kết quả.
+- Xác minh nghiệm thu:
+  - Chạy `browser-acceptance.cjs` (Playwright Chromium) trên máy chủ bản dựng cổng 3101: **ĐẠT 88/88 nhóm**, 0 lỗi.
+  - Toàn bộ pipeline kiểm tra: `npm test` 20/20 ĐẠT, PHP visibility 29/29 ĐẠT, `npx tsc --noEmit` ĐẠT, `npm run lint` ĐẠT, `npm run build` ĐẠT (63 trang tĩnh Turbopack trong 1.6s).
+
 ## 2026-11-26 — dọn dẹp mã kế thừa, chuẩn hóa trang thông tin và tối ưu hóa build
 - Thực hiện quyết định dọn dẹp các tuyến và component kế thừa từ giai đoạn ban đầu (trước khi chuyển đổi sang mô hình đa tạp chí):
   - Xóa bỏ `HomeContent.tsx` không dùng.

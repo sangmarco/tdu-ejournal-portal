@@ -1,5 +1,25 @@
 # Báo cáo kiểm thử
 
+## 2026-11-26 — Tích hợp và hiển thị ảnh bìa (Cover Images) từ OJS cho Số và Bài báo
+- **Nghiệm thu trích xuất ảnh bìa**:
+  - `PublicPublicationsController.php`: Kiểm tra tính hợp lệ của tệp ảnh bìa (chỉ nhận định dạng `.jpg`, `.jpeg`, `.png`, `.webp`, không chứa ký tự đặc biệt hay đường dẫn lùi) trước khi công khai hóa đường dẫn qua `coverUrl`.
+  - Kiểm tra thực tế:
+    - Số 2 (`tapchi2`): Trả về `"coverUrl":{"vi":"http://localhost/ojs/public/journals/2/cover_issue_2_vi.jpg"}`.
+    - Số 1 (`tapchi1`): Bài 1 có `"coverUrl":{"vi":"http://localhost/ojs/public/journals/1/submission_1_1_coverImage_vi.jpg"}`; Bài 2 có `"coverUrl":{"en":"http://localhost/ojs/public/journals/1/submission_2_2_coverImage_en.png"}`.
+- **Kiểm thử đơn vị và bảo mật**:
+  - Bổ sung kiểm thử `safeCoverUrl` trong `src/lib/ojs/publicModel.test.ts`: xác nhận từ chối tệp `.php`, từ chối path traversal `..`, từ chối query string `?query=1`, từ chối domain lạ.
+  - Tổng số kiểm thử: **20/20 ĐẠT**.
+- **Kiểm thử chấp nhận Chromium thực tế (Playwright)**:
+  - Lệnh chạy: `$env:PLAYWRIGHT_MODULE='C:\Users\Admin\AppData\Local\Temp\opencode\browser-acceptance\node_modules\playwright'; $env:ACCEPTANCE_BASE_URL='http://localhost:3101'; node scripts/browser-acceptance.cjs`
+  - Kết quả: **ĐẠT 88/88 nhóm** kiểm thử (0 thất bại) trên bản dựng production thực tế cổng 3101.
+  - Cả 4 khung nhìn: 1440px (Desktop), 1024px (Tablet ngang), 768px (Tablet dọc), 375px (Mobile hẹp).
+  - Không có hiện tượng tràn ngang (horizontal overflow) do ảnh bìa gây ra.
+- **Kiểm thử tĩnh & bản dựng**:
+  - `php integrations/ojs-public-publications/tests/visibility.php`: **ĐẠT 29/29** khẳng định.
+  - `npx tsc --noEmit`: **ĐẠT** (0 lỗi TypeScript).
+  - `npm run lint`: **ĐẠT** (0 cảnh báo, 0 lỗi ESLint).
+  - `npm run build`: **ĐẠT** (63 trang tĩnh Turbopack hoàn tất trong 1.6s).
+
 ## 2026-11-26 — Dọn dẹp mã kế thừa, chuẩn hóa trang thông tin và tối ưu hóa build
 - **Dọn dẹp mã nguồn & loại bỏ thành phần chết**:
   - Xóa `HomeContent.tsx` không dùng.
