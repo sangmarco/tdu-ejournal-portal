@@ -1,5 +1,22 @@
 # Nhật ký phát triển
 
+## 2026-11-26 — dọn dẹp mã kế thừa, chuẩn hóa trang thông tin và tối ưu hóa build
+- Thực hiện quyết định dọn dẹp các tuyến và component kế thừa từ giai đoạn ban đầu (trước khi chuyển đổi sang mô hình đa tạp chí):
+  - Xóa bỏ `HomeContent.tsx` không dùng.
+  - Thay thế các route đơn tạp chí cũ bằng cơ chế chuyển hướng (redirect) an toàn và chuẩn hóa:
+    - `/archives` và `/current-issue` chuyển hướng về `/journals`.
+    - `/issues/[id]` và `/articles/[id]` tự động tra cứu tạp chí sở hữu và chuyển hướng đến `/journals/[slug]/issues/[id]` và `/journals/[slug]/articles/[id]`.
+    - Xóa các vòng lặp sinh tham số tĩnh `generateStaticParams()` vốn sinh 500 trang tĩnh giả (400 cho articles, 100 cho issues).
+    - Xóa các component cũ `ArchivesContent.tsx`, `CurrentIssueContent.tsx`, `IssueContent.tsx`, `ArticleContent.tsx`.
+- Chuẩn hóa các trang thông tin `about`, `editorial-board`, `contact`:
+  - Loại bỏ các hook `useUsers` và `useJournal` gọi vào các endpoint OJS người dùng nội bộ (bị chặn 404 để bảo mật danh tính).
+  - Cung cấp nội dung chuẩn mực về Cổng tạp chí TDU, Trường Đại học Thành Đông, tiêu chuẩn COPE, truy cập mở và hướng dẫn tra cứu ban biên tập chi tiết theo từng chuyên san.
+  - Bổ sung `loading.tsx` cho `/articles/[id]` và `/issues/[id]` nhằm bảo đảm giới hạn Suspense cho cơ chế Partial Prerendering của Next.js 16.
+- Kết quả tối ưu hóa:
+  - Số trang tĩnh khi build giảm từ 563 trang xuống **63 trang**.
+  - Thời gian biên dịch Turbopack giảm từ 4.6 giây xuống **1.7 giây** (nhanh hơn gần 3 lần).
+  - Toàn bộ kiểm thử chất lượng: `npm test` 19/19 ĐẠT, PHP visibility 29/29 ĐẠT, `npx tsc --noEmit` ĐẠT, `npm run lint` ĐẠT, `npm run build` ĐẠT.
+
 ## 2026-11-26 — xử lý triệt để và xác minh làm giàu siêu dữ liệu OAI thực tế
 - Phân tích nguyên nhân OAI enrichment trả về 0: Bộ phân tích `metadataMerge.ts` yêu cầu so khớp chính xác tuyệt đối URL bài báo giữa REST projection và OAI `dc:identifier`. Trong khi OJS 3.5.0.6 xuất OAI Dublin Core (`Dc11SchemaArticleAdapter.php:163`) dùng `urlLocaleForPage: ''` tạo URL chuẩn hóa không kèm mã ngôn ngữ (`/article/view/{bestId}`), thì `PublicPublicationsController::readerUrl()` lại sinh URL kèm tiền tố ngôn ngữ hiện tại của yêu cầu (`/vi/article/view/{bestId}`).
 - Cập nhật chuẩn hóa: Sửa `readerUrl()` trong `PublicPublicationsController` (cả trong thư mục tích hợp và thư mục plugin OJS thực tế) truyền `urlLocaleForPage: ''` theo đúng chữ ký của `Dispatcher::url()`.

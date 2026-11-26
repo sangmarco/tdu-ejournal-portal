@@ -1,6 +1,26 @@
 # Bắt đầu tại đây — bàn giao cho phiên tiếp theo
 
-## Làm giàu siêu dữ liệu OAI thực tế thành công trên cả hai tạp chí (2026-11-26; mới nhất)
+## Dọn dẹp trang và hook cũ, chuẩn hóa trang thông tin và tối ưu hóa build (2026-11-26; mới nhất)
+- **ĐÃ HOÀN TẤT DỌN DẸP & TỐI ƯU**:
+  - Đã xóa mã chết `app/[locale]/HomeContent.tsx` không còn sử dụng.
+  - Chuyển hướng an toàn (Graceful Redirects) cho các tuyến đơn tạp chí cũ để tương thích ngược hoàn toàn và bảo đảm cấu trúc đa tạp chí chuẩn:
+    - `/[locale]/archives` -> `/[locale]/journals` (xóa `ArchivesContent.tsx`).
+    - `/[locale]/current-issue` -> `/[locale]/journals` (xóa `CurrentIssueContent.tsx`).
+    - `/[locale]/issues/[id]` -> tự động tra cứu và chuyển hướng tới `/[locale]/journals/[slug]/issues/[id]` nếu số tồn tại, 404 nếu không (xóa `IssueContent.tsx`).
+    - `/[locale]/articles/[id]` -> tự động tra cứu và chuyển hướng tới `/[locale]/journals/[slug]/articles/[id]` nếu bài tồn tại, 404 nếu không (xóa `ArticleContent.tsx`).
+  - **Tối ưu hóa build vượt bậc**: Loại bỏ các vòng lặp sinh tham số tĩnh giả `generateStaticParams()` (trước đây sinh 400 trang tĩnh cho articles và 100 trang tĩnh cho issues). Số trang tĩnh khi build giảm từ 563 trang xuống còn **63 trang**, thời gian biên dịch chỉ còn **1.7 giây**!
+  - **Chuẩn hóa các trang thông tin**:
+    - `app/[locale]/about/AboutContent.tsx`: Loại bỏ các hook cũ gọi API người dùng nội bộ, trình bày thông tin giới thiệu chính thức về Cổng tạp chí TDU, sứ mệnh xuất bản, tiêu chuẩn COPE, truy cập mở Open Access và cơ quan xuất bản Trường Đại học Thành Đông.
+    - `app/[locale]/editorial-board/EditorialBoardContent.tsx`: Bỏ gọi `useUsers` (vốn bị lỗi 404 do OJS bảo mật thông tin người dùng nội bộ), trình bày cơ cấu Hội đồng chỉ đạo, Ban cố vấn khoa học và hướng dẫn tra cứu ban biên tập chi tiết theo từng chuyên san.
+    - `app/[locale]/contact/ContactContent.tsx`: Trình bày thông tin liên hệ chính thức của Trường Đại học Thành Đông (Số 3 Vũ Công Đán, P. Tứ Minh, TP. Hải Dương), email tòa soạn, thời gian làm việc và biểu mẫu liên hệ trực tuyến.
+- **Kết quả kiểm tra toàn diện**:
+  - `npm test`: ĐẠT 19/19 (100%).
+  - `php integrations/ojs-public-publications/tests/visibility.php`: ĐẠT 29/29 khẳng định.
+  - `npx tsc --noEmit`: ĐẠT (0 lỗi).
+  - `npm run lint`: ĐẠT (0 cảnh báo, 0 lỗi).
+  - `npm run build`: ĐẠT (63 trang tĩnh Turbopack sạch sẽ).
+
+## Làm giàu siêu dữ liệu OAI thực tế thành công trên cả hai tạp chí (2026-11-26)
 - **ĐÃ GIẢI QUYẾT**: Nguyên nhân trước đó OAI trả về 0 bản ghi được làm giàu là do `PublicPublicationsController::readerUrl()` mặc định tạo URL mang mã ngôn ngữ cố định (ví dụ `/tapchi1/vi/article/view/2`), trong khi Dublin Core OAI của OJS 3.5.0.6 (`Dc11SchemaArticleAdapter.php:163`) dùng `urlLocaleForPage: ''` để tạo URL định danh chuẩn hóa không gắn ngôn ngữ (`/tapchi1/article/view/2`). Do cơ chế `mergeOaiMetadata` so khớp chính xác tuyệt đối theo URL định danh, sự lệch tiền tố ngôn ngữ đã khiến phép so khớp không tìm thấy bản ghi.
 - **ĐÃ THỰC THI**: Cập nhật `readerUrl()` trong `PublicPublicationsController` truyền tham số `urlLocaleForPage: ''` theo chuẩn OJS `Dispatcher::url()`.
 - **ĐÃ XÁC MINH TRỰC TIẾP (100% 3/3 bài báo)**:

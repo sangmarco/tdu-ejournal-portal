@@ -1,5 +1,27 @@
 # Báo cáo kiểm thử
 
+## 2026-11-26 — Dọn dẹp mã kế thừa, chuẩn hóa trang thông tin và tối ưu hóa build
+- **Dọn dẹp mã nguồn & loại bỏ thành phần chết**:
+  - Xóa `HomeContent.tsx` không dùng.
+  - Xóa `ArchivesContent.tsx`, `CurrentIssueContent.tsx`, `IssueContent.tsx`, `ArticleContent.tsx` kế thừa từ chế độ đơn tạp chí.
+  - Thiết lập cơ chế chuyển hướng tương thích ngược (Graceful Redirects):
+    - `/[locale]/archives` -> `/[locale]/journals` (HTTP 307/308).
+    - `/[locale]/current-issue` -> `/[locale]/journals`.
+    - `/[locale]/issues/[id]` -> chuyển hướng chính xác đến `/[locale]/journals/[slug]/issues/[id]` dựa trên tra cứu danh sách tạp chí đã duyệt.
+    - `/[locale]/articles/[id]` -> chuyển hướng chính xác đến `/[locale]/journals/[slug]/articles/[id]` dựa trên bài báo đã xuất bản.
+- **Tối ưu hóa build sản phẩm (Next.js Turbopack)**:
+  - Loại bỏ các vòng lặp sinh tham số tĩnh giả `generateStaticParams()` (trước đây sinh 400 trang tĩnh cho articles và 100 trang tĩnh cho issues).
+  - Kết quả: Tổng số trang tĩnh khi biên dịch giảm từ 563 trang xuống **63 trang**, thời gian tạo trang giảm xuống chỉ còn **1.7 giây** (nhanh gấp gần 3 lần).
+- **Chuẩn hóa các trang thông tin (about, editorial-board, contact)**:
+  - Loại bỏ toàn bộ các hook gọi API người dùng nội bộ OJS (bị chặn 404 để bảo mật).
+  - Trình bày thông tin chính thống về Cổng tạp chí TDU, Trường Đại học Thành Đông, tiêu chuẩn COPE, truy cập mở và hướng dẫn tra cứu ban biên tập chi tiết theo từng chuyên san.
+- **Kết quả kiểm thử kỹ thuật**:
+  - `npm test`: **ĐẠT 19/19** kiểm thử tổng hợp.
+  - `php integrations/ojs-public-publications/tests/visibility.php`: **ĐẠT 29/29** khẳng định.
+  - `npx tsc --noEmit`: **ĐẠT** (0 lỗi TypeScript).
+  - `npm run lint`: **ĐẠT** (0 cảnh báo, 0 lỗi).
+  - `npm run build`: **ĐẠT** (63 trang tĩnh Turbopack hoàn tất trong 1.7s).
+
 ## 2026-11-26 — Làm giàu siêu dữ liệu OAI thực tế thành công trên cả hai tạp chí
 - **Nguyên nhân trước đó OAI trả về 0**: Trong `PublicPublicationsController`, phương thức `readerUrl()` mặc định sinh URL có tiền tố ngôn ngữ (ví dụ `/tapchi1/vi/article/view/2`), trong khi Dublin Core OAI của OJS 3.5.0.6 (`Dc11SchemaArticleAdapter.php:163`) dùng `urlLocaleForPage: ''` để tạo URL định danh chuẩn hóa không gắn ngôn ngữ cố định (`/tapchi1/article/view/2`). Do cơ chế `mergeOaiMetadata` so khớp chính xác tuyệt đối theo URL định danh, sự lệch tiền tố ngôn ngữ đã khiến phép so khớp không tìm thấy bản ghi.
 - **Giải pháp tối thiểu, chuẩn OJS**: Đã cập nhật `readerUrl()` trong `PublicPublicationsController` thêm tham số `urlLocaleForPage: ''` đúng chuẩn của OJS `Dispatcher::url()`.

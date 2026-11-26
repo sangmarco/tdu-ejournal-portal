@@ -1,6 +1,14 @@
 # Lộ trình
 
-## Cập nhật làm giàu siêu dữ liệu OAI thực tế thành công (2026-11-26; mới nhất)
+## Cập nhật dọn dẹp mã kế thừa và tối ưu hóa build (2026-11-26; mới nhất)
+- HOÀN TẤT: Xóa mã chết `HomeContent.tsx` và các component thừa `ArchivesContent.tsx`, `CurrentIssueContent.tsx`, `IssueContent.tsx`, `ArticleContent.tsx`.
+- HOÀN TẤT: Cấu hình chuyển hướng an toàn (Graceful Redirects) cho các tuyến cũ: `/archives` và `/current-issue` chuyển hướng về `/journals`; `/articles/[id]` và `/issues/[id]` tự động tra cứu tạp chí sở hữu và chuyển hướng đến các tuyến đa tạp chí chuẩn.
+- HOÀN TẤT: Chuẩn hóa các trang thông tin `about`, `editorial-board`, `contact` loại bỏ các hook gọi API users bị chặn 404, cung cấp đầy đủ thông tin chuẩn của Trường Đại học Thành Đông.
+- HOÀN TẤT: Tối ưu hóa build vượt bậc — giảm từ 563 trang tĩnh xuống **63 trang tĩnh**, thời gian biên dịch Turbopack giảm từ 4.6s xuống **1.7s**.
+- HOÀN TẤT: Kiểm thử đơn vị 19/19 ĐẠT, PHP visibility 29/29 ĐẠT, TypeScript ĐẠT, lint ĐẠT, build ĐẠT.
+- TIẾP THEO: Kiểm toán khả năng tiếp cận sâu (trình đọc màn hình, độ tương phản màu sắc toàn diện), kiểm thử đa trình duyệt (Firefox, WebKit); kiểm thử quyền truy cập PDF/bìa nếu được cấu hình trên OJS.
+
+## Cập nhật làm giàu siêu dữ liệu OAI thực tế thành công (2026-11-26)
 - HOÀN TẤT: Chuẩn hóa `readerUrl()` trong `PublicPublicationsController` dùng `urlLocaleForPage: ''` khớp chính xác với định danh Dublin Core OAI `dc:identifier` của OJS 3.5.0.6.
 - HOÀN TẤT: Xác minh làm giàu siêu dữ liệu OAI thực tế 100% (3/3 bài báo thuộc cả hai tạp chí tapchi1 và tapchi2): tóm tắt `abstract` theo từng ngôn ngữ và từ khóa `subjects` được hợp nhất đầy đủ vào kết quả của cổng thông tin.
 - HOÀN TẤT: Kiểm thử đơn vị 19/19 ĐẠT, PHP visibility 29/29 ĐẠT, TypeScript ĐẠT, lint ĐẠT, build 563 trang tĩnh Turbopack ĐẠT.
