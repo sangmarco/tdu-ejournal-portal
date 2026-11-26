@@ -1,6 +1,29 @@
 # Bắt đầu tại đây — bàn giao cho phiên tiếp theo
 
-## Tích hợp và hiển thị ảnh bìa (Cover Images) cho Số và Bài báo từ OJS (2026-11-26; mới nhất)
+## Tích hợp công cụ trích dẫn học thuật tự động (APA/BibTeX/RIS) và chia sẻ bài báo (2026-11-26; mới nhất)
+- **ĐÃ HOÀN TẤT & ĐẠT CHUẨN UI/UX WIREFRAME**:
+  - **Module trích dẫn học thuật tự động (`src/lib/citation.ts`)**:
+    - Định dạng **APA 7th edition**: Định dạng chuẩn tắc tác giả, năm xuất bản `(Year)`, tiêu đề bài báo, tên tạp chí, tập(số), số trang và DOI/URL. Hỗ trợ fallback linh hoạt khi thiếu tập/số.
+    - Định dạng **BibTeX (`@article`)**: Tự sinh khóa trích dẫn theo họ tác giả đầu và năm, định dạng đầy đủ các trường `title`, `author`, `journal`, `year`, `volume`, `number`, `pages`, `doi`, `url`.
+    - Định dạng **RIS (`TY - JOUR`)**: Định dạng chuẩn theo hệ thống Research Information Systems với các thẻ `TI`, `AU`, `JO`, `PY`, `VL`, `IS`, `SP`, `EP`, `DO`, `UR`, `ER` sẵn sàng nhập trực tiếp vào Zotero, Mendeley, EndNote.
+  - **Kiểm thử đơn vị chuyên sâu (`src/lib/citation.test.ts`)**:
+    - Xác minh thuật toán sinh trích dẫn cho cả ba định dạng với dữ liệu học thuật đầy đủ và tối giản.
+    - Cập nhật kịch bản kiểm thử trong `package.json` lên toàn bộ `src/lib/**/*.test.ts`, nâng tổng số kiểm thử đơn vị lên **23/23 ĐẠT** (100%).
+  - **Giao diện tương tác chuẩn trợ năng (`src/components/article/ArticleActions.tsx`)**:
+    - Bổ sung khối "Trích dẫn & Chia sẻ" vào trang chi tiết bài báo (`app/[locale]/journals/[slug]/articles/[id]/page.tsx`).
+    - Tab chọn APA / BibTeX / RIS có cấu trúc ngữ nghĩa ARIA (`role="tablist"`, `role="tab"`, `role="tabpanel"`, `aria-selected`).
+    - Tính năng "Sao chép trích dẫn" (Copy to clipboard) có phản hồi thị giác trực quan.
+    - Tính năng "Tải .bib / .ris" cho phép tải trực tiếp tệp trích dẫn vào máy tính.
+    - Tính năng "Sao chép liên kết" và "Chia sẻ qua Email" (mailto với tiêu đề và URL bài viết).
+    - Tuyên bố giấy phép truy cập mở Creative Commons CC BY-NC 4.0 chuẩn mực.
+- **Kết quả kiểm tra toàn diện**:
+  - `npm test`: **ĐẠT 23/23** kiểm thử đơn vị.
+  - `php integrations/ojs-public-publications/tests/visibility.php`: **ĐẠT 29/29** khẳng định.
+  - `npx tsc --noEmit`: **ĐẠT** (0 lỗi TypeScript).
+  - `npm run lint`: **ĐẠT** (0 cảnh báo, 0 lỗi).
+  - `npm run build`: **ĐẠT** (63 trang tĩnh Turbopack chỉ trong 1.7s).
+
+## Tích hợp và hiển thị ảnh bìa (Cover Images) cho Số và Bài báo từ OJS (2026-11-26)
 - **ĐÃ TRIỂN KHAI VÀ XÁC MINH TOÀN DIỆN**:
   - **Trích xuất ảnh bìa an toàn từ OJS 3.5.0.6**:
     - Số tạp chí (Issue): lấy trường `coverImage` (ví dụ `cover_issue_2_vi.jpg`), xác thực định dạng an toàn (jpg, png, webp), chiếu thành `coverUrl` công khai dạng `http://localhost/ojs/public/journals/{contextId}/{filename}`.

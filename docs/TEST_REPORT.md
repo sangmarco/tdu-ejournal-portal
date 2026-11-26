@@ -1,5 +1,24 @@
 # Báo cáo kiểm thử
 
+## 2026-11-26 — Tích hợp công cụ trích dẫn học thuật tự động (APA/BibTeX/RIS) và chia sẻ bài báo
+- **Nghiệm thu định dạng trích dẫn khoa học**:
+  - `formatAPA()`: Kiểm tra định dạng theo chuẩn APA 7th Edition với đầy đủ tên tác giả, năm, tiêu đề, tên tạp chí, tập, số, trang và DOI. Trường hợp thiếu tác giả hoặc năm có cơ chế fallback `(n.d.)` chuẩn học thuật.
+  - `formatBibTeX()`: Kiểm tra cấu trúc bản ghi `@article` chuẩn BibTeX, tự tạo bibkey từ tên tác giả và năm.
+  - `formatRIS()`: Kiểm tra cấu trúc bản ghi `TY  - JOUR` theo chuẩn RIS để nhập trực tiếp vào Zotero / Mendeley / EndNote.
+- **Kiểm thử đơn vị tự động**:
+  - Bổ sung `src/lib/citation.test.ts` (3 kiểm thử mới).
+  - Cập nhật kịch bản kiểm thử dự án để chạy mọi file `*.test.ts`.
+  - Tổng số kiểm thử: **23/23 ĐẠT** (100%).
+- **Kiểm thử giao diện & trợ năng**:
+  - Cấu trúc ARIA tablist/tabpanel chuẩn mực, nhãn trợ năng `aria-label` cho các nút sao chép và chia sẻ.
+  - Không gây tràn chiều ngang trên màn hình hẹp 375px (`[overflow-wrap:anywhere]`).
+  - Lệnh nghiệm thu Chromium thực tế (Playwright): `$env:PLAYWRIGHT_MODULE='C:\Users\Admin\AppData\Local\Temp\opencode\browser-acceptance\node_modules\playwright'; $env:ACCEPTANCE_BASE_URL='http://localhost:3101'; node scripts/browser-acceptance.cjs` — **ĐẠT 88/88 nhóm** kiểm thử (0 thất bại) trên bản dựng production thực tế.
+- **Kiểm thử tĩnh & bản dựng**:
+  - `php integrations/ojs-public-publications/tests/visibility.php`: **ĐẠT 29/29** khẳng định.
+  - `npx tsc --noEmit`: **ĐẠT** (0 lỗi TypeScript).
+  - `npm run lint`: **ĐẠT** (0 cảnh báo, 0 lỗi ESLint).
+  - `npm run build`: **ĐẠT** (63 trang tĩnh Turbopack hoàn tất trong 1.7s).
+
 ## 2026-11-26 — Tích hợp và hiển thị ảnh bìa (Cover Images) từ OJS cho Số và Bài báo
 - **Nghiệm thu trích xuất ảnh bìa**:
   - `PublicPublicationsController.php`: Kiểm tra tính hợp lệ của tệp ảnh bìa (chỉ nhận định dạng `.jpg`, `.jpeg`, `.png`, `.webp`, không chứa ký tự đặc biệt hay đường dẫn lùi) trước khi công khai hóa đường dẫn qua `coverUrl`.

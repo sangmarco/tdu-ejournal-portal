@@ -1,6 +1,14 @@
 # Lộ trình
 
-## Cập nhật tích hợp ảnh bìa và xác minh trình duyệt thực tế (2026-11-26; mới nhất)
+## Cập nhật công cụ trích dẫn học thuật tự động và chia sẻ bài báo (2026-11-26; mới nhất)
+- HOÀN TẤT: Xây dựng module trích dẫn học thuật độc lập `src/lib/citation.ts` hỗ trợ 3 chuẩn định dạng quốc tế APA 7th Edition, BibTeX và RIS.
+- HOÀN TẤT: Kiểm thử đơn vị tự động 23/23 ĐẠT với 3 ca kiểm thử định dạng học thuật trong `src/lib/citation.test.ts`.
+- HOÀN TẤT: Thiết kế component tương tác `ArticleActions.tsx` (sao chép trích dẫn, tải tệp `.bib`/`.ris`, sao chép liên kết, chia sẻ qua email, bản quyền CC BY-NC 4.0).
+- HOÀN TẤT: Nghiệm thu Playwright Chromium trên bản dựng thật cổng 3101: 88/88 nhóm ĐẠT (0 lỗi console, 0 lỗi layout) ở cả 4 khung nhìn 1440/1024/768/375px.
+- HOÀN TẤT: Toàn bộ kiểm thử chất lượng: `npm test` 23/23 ĐẠT, PHP visibility 29/29 ĐẠT, TypeScript ĐẠT, lint ĐẠT, build 63 trang tĩnh Turbopack ĐẠT.
+- TIẾP THEO: Kiểm toán khả năng tiếp cận sâu (trình đọc màn hình NVDA/VoiceOver, kiểm thử phím chuyển đổi bàn phím mở rộng), kiểm thử đa trình duyệt (Firefox, WebKit); kiểm thử quyền truy cập PDF nếu OJS cấu hình tệp toàn văn thực tế.
+
+## Cập nhật tích hợp ảnh bìa và xác minh trình duyệt thực tế (2026-11-26)
 - HOÀN TẤT: Trích xuất và chiếu trường `coverUrl` an toàn từ OJS 3.5.0.6 cho cả số báo và bài báo.
 - HOÀN TẤT: Thẩm định bảo mật `safeCoverUrl` chống tấn công path traversal, kiểm tra định dạng hình ảnh và origin hợp lệ.
 - HOÀN TẤT: Hiển thị giao diện ảnh bìa đồng bộ trên Trang chủ, Trang chuyên san, Trang mục lục số báo, Trang bài báo và Trang tìm kiếm.

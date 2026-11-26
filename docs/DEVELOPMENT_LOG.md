@@ -1,5 +1,26 @@
 # Nhật ký phát triển
 
+## 2026-11-26 — tích hợp công cụ trích dẫn học thuật tự động (APA/BibTeX/RIS) và chia sẻ bài báo
+- Đối chiếu yêu cầu wireframe trang 2 (Article Detail) trong `docs/UI_UX_GUIDELINES.md`:
+  - Wireframe yêu cầu có công cụ trích dẫn khoa học (APA, RIS, BibTeX), chia sẻ (share link, email) và tuyên bố bản quyền / truy cập mở.
+- Xây dựng module trích dẫn học thuật độc lập `src/lib/citation.ts`:
+  - `formatAPA()`: Sinh định dạng APA 7th Edition từ các trường dữ liệu bài báo (tác giả, năm, tiêu đề, tên tạp chí, tập, số, trang, DOI/URL).
+  - `formatBibTeX()`: Sinh bản ghi `@article` chuẩn BibTeX với khóa bibkey tự động.
+  - `formatRIS()`: Sinh bản ghi `TY  - JOUR` theo chuẩn Research Information Systems để tương thích với Zotero, Mendeley, EndNote.
+- Viết bộ kiểm thử đơn vị `src/lib/citation.test.ts`:
+  - Kiểm tra tính đúng đắn của chuỗi kết quả và cơ chế fallback khi thiếu dữ liệu.
+  - Cập nhật lệnh kiểm thử trong `package.json` lên `src/lib/**/*.test.ts`, nâng tổng số kiểm thử đơn vị lên 23/23 ĐẠT.
+- Thiết kế thành phần tương tác `src/components/article/ArticleActions.tsx`:
+  - Cung cấp giao diện tab chọn định dạng trích dẫn (APA, BibTeX, RIS) với cấu trúc ARIA tablist/tabpanel chuẩn mực.
+  - Chức năng sao chép trích dẫn một chạm vào clipboard (Copy) kèm phản hồi trực quan.
+  - Chức năng tải tệp `.bib` và `.ris` trực tiếp vào máy tính độc giả.
+  - Nút sao chép liên kết bài báo và chia sẻ qua Email.
+  - Thông báo bản quyền Creative Commons CC BY-NC 4.0.
+  - Tích hợp vào `app/[locale]/journals/[slug]/articles/[id]/page.tsx` trong cột nội dung chính bên dưới phần tóm tắt và từ khóa.
+- Nghiệm thu tự động Playwright:
+  - Khởi động máy chủ bản dựng sản phẩm cổng 3101, chạy `scripts/browser-acceptance.cjs`: **ĐẠT 88/88 nhóm**, 0 lỗi.
+  - Toàn bộ pipeline kiểm tra: `npm test` 23/23 ĐẠT, PHP visibility 29/29 ĐẠT, `npx tsc --noEmit` ĐẠT, `npm run lint` ĐẠT, `npm run build` ĐẠT (63 trang tĩnh Turbopack trong 1.7s).
+
 ## 2026-11-26 — tích hợp và hiển thị ảnh bìa (Cover Images) cho Số và Bài báo từ OJS
 - Khảo sát thực địa dữ liệu tệp ảnh bìa trong OJS 3.5.0.6:
   - Bảng dữ liệu số báo có `coverImage` trỏ tới tệp trong thư mục `public/journals/{contextId}/` (ví dụ `cover_issue_2_vi.jpg` tại tạp chí 2).
