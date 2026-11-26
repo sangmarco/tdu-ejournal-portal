@@ -1,17 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import type { OJSUser } from '@/lib/ojs';
 import { Locale, dict } from '@/lib/i18n';
 import { useUsers } from '@/hooks/useOJS';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
 
 const usersParams = { perPage: 100 } as const;
 
-function EditorCard({ editor, locale, role }: { editor: any; locale: Locale; role: string }) {
-  const t = dict[locale];
+function EditorCard({ editor, locale, role }: { editor: OJSUser; locale: Locale; role: string }) {
   const name = `${editor.firstName?.[locale] || editor.firstName?.vi} ${editor.lastName?.[locale] || editor.lastName?.vi}`;
   const affiliation = editor.affiliation?.[locale] || editor.affiliation?.vi;
   const initials = `${editor.firstName?.[locale]?.charAt(0) || 'E'}${editor.lastName?.[locale]?.charAt(0) || 'D'}`;
@@ -38,7 +36,7 @@ function EditorCard({ editor, locale, role }: { editor: any; locale: Locale; rol
   );
 }
 
-function EditorSection({ title, editors, locale, role }: { title: string; editors: any[]; locale: Locale; role: string }) {
+function EditorSection({ title, editors, locale, role }: { title: string; editors: OJSUser[]; locale: Locale; role: string }) {
   if (!editors.length) return null;
 
   return (
@@ -88,20 +86,20 @@ export default function EditorialBoardContent({ locale }: { locale: Locale }) {
 
   const allUsers = users?.data || [];
 
-  const chiefEditors = allUsers.filter((u: any) =>
-    u.roles?.some((r: any) => r.name?.[locale]?.includes('Chief Editor') || r.name?.vi?.includes('Chủ biên'))
+  const chiefEditors = allUsers.filter((u) =>
+    u.roles?.some((r) => r.name?.[locale]?.includes('Chief Editor') || r.name?.vi?.includes('Chủ biên'))
   );
-  const deputyEditors = allUsers.filter((u: any) =>
-    u.roles?.some((r: any) => r.name?.[locale]?.includes('Deputy Editor') || r.name?.vi?.includes('Phó chủ biên'))
+  const deputyEditors = allUsers.filter((u) =>
+    u.roles?.some((r) => r.name?.[locale]?.includes('Deputy Editor') || r.name?.vi?.includes('Phó chủ biên'))
   );
-  const editors = allUsers.filter((u: any) =>
-    u.roles?.some((r: any) => (r.name?.[locale]?.includes('Editor') || r.name?.vi?.includes('Biên tập')) && !r.name?.[locale]?.includes('Chief') && !r.name?.vi?.includes('Chủ'))
+  const editors = allUsers.filter((u) =>
+    u.roles?.some((r) => (r.name?.[locale]?.includes('Editor') || r.name?.vi?.includes('Biên tập')) && !r.name?.[locale]?.includes('Chief') && !r.name?.vi?.includes('Chủ'))
   );
-  const internationalEditors = allUsers.filter((u: any) =>
-    u.roles?.some((r: any) => r.name?.[locale]?.includes('International') || r.name?.vi?.includes('Quốc tế'))
+  const internationalEditors = allUsers.filter((u) =>
+    u.roles?.some((r) => r.name?.[locale]?.includes('International') || r.name?.vi?.includes('Quốc tế'))
   );
-  const reviewers = allUsers.filter((u: any) =>
-    u.roles?.some((r: any) => r.name?.[locale]?.includes('Reviewer') || r.name?.vi?.includes('Đánh giá'))
+  const reviewers = allUsers.filter((u) =>
+    u.roles?.some((r) => r.name?.[locale]?.includes('Reviewer') || r.name?.vi?.includes('Đánh giá'))
   );
 
   return (

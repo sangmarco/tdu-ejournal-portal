@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Locale, locales, dict } from '@/lib/i18n';
+import { Locale, locales, dict, getTranslationList } from '@/lib/i18n';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -83,7 +83,7 @@ function SectionCard({ section, locale }: { section: typeof sections[0]; locale:
         {t[section.titleKey]}
       </h2>
       <div className="prose prose-gray max-w-none text-gray-700">
-        {t[section.contentKey]?.map((paragraph: string, i: number) => (
+        {getTranslationList(locale, section.contentKey).map((paragraph: string, i: number) => (
           <p key={i} className="mb-4">{paragraph}</p>
         ))}
       </div>

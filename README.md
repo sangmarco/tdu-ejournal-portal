@@ -1,51 +1,19 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TDU eJournal Portal
 
-## Getting Started
+Cổng thông tin tạp chí khoa học Trường Đại học Thành Đông. Next.js App Router, TypeScript; OJS 3.5.0.6 remains the publication system of record. Multi-journal migration is in progress.
 
-Configure the OJS journal in `.env.local` in this directory, then restart Next.js.
-Use the URL of the journal immediately before `/api/v1`. For example, a local
-OJS installation without URL rewriting might use the following settings:
+## Local setup
+Check out feature/multi-journal-ojs (or the current implementation branch). Install dependencies with npm ci. Copy .env.example to .env.local and set:
 
 ```dotenv
-OJS_BASE_URL=http://localhost/ojs/index.php/YOUR_JOURNAL_PATH
-OJS_JOURNAL_ID=1
-OJS_API_KEY=YOUR_SERVER_SIDE_TOKEN
+OJS_BASE_URL=http://localhost/ojs/index.php
+OJS_PUBLIC_BASE_URL=http://localhost/ojs/index.php
+OJS_PUBLIC_JOURNALS=tapchi1
 ```
 
-Replace the example values with the journal's actual path, numeric context ID,
-and token. Browser requests go to `/api/ojs` on the frontend's origin. Next.js
-contacts OJS using its server environment. If Next.js runs in a container,
-use an OJS address reachable from inside that container.
+The base must not include a journal path or /api/v1. Configure only journals approved for public display. Add more paths separated by commas. Start OJS, then npm run dev. If Next.js is in a container, use an upstream address reachable from that container and a browser-reachable public base URL.
 
-First, run the development server:
+Try /vi/journals, /vi/journals/tapchi1, /vi/journals/tapchi1/issues/1 and /api/ojs/articles?journal=tapchi1 on the Next.js server. These are implemented routes, not confirmed live test results. No admin token is required by the current public proxy; anonymous access on the user's installation remains to be tested.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## AI handoff
+Read AGENTS.md and docs/HANDOFF.md first. The docs directory is shared versioned project memory for Codex, Claude Code and ChatGPT. See docs/TEST_REPORT.md before relying on any feature. No production-ready claim is made. Do not merge main until validation and review.

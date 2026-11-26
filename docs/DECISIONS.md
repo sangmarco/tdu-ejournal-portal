@@ -1,0 +1,25 @@
+# Decision log
+- D16 (2026-11-26, live integration): Deployed and activated independent GenericPlugin `publicPublications` in `C:\xampp\htdocs\ojs\plugins\generic\publicPublications` for pilot context `tapchi1`.
+  - Registered via `APIHandler::endpoints::plugin` (`function ($hook, $router)` in OJS 3.5.0.6).
+  - Controller `PublicPublicationsController` extends `PKPBaseController` with `authorize()` returning true and fail-closed `Visibility::context()`.
+  - `Visibility::context()` handles `publishingMode` defaulting to 0 (OPEN) when null in OJS DB.
+  - Endpoints live and verified anonymously without authentication:
+    - `GET /tapchi1/api/v1/publicPublications/issues` -> 200 OK (`contract: "public-publications-v1"`).
+    - `GET /tapchi1/api/v1/publicPublications/issues/1` -> 200 OK (returns issue detail with 2 published articles).
+  - Negative security verification passed: non-existent journal yields 404, invalid issue id yields 404, malformed pagination yields 400 Bad Request.
+  - Live Next.js service integration verified: `issueList`, `issueDetail`, and `journalArticles` (merging live REST articles with live OAI metadata) succeed end-to-end.
+- D15 (2026-11-26): Evaluated user-provided reference PDF (`D:\WEBSITE TAP CHI - SANG KIEN NCKH\g.pdf`, 151 pages, Sao Do University thesis on a standalone Laravel+React journal system). Concluded that a custom standalone rebuild discarding OJS does not fit TDU's architectural requirement to aggregate multiple existing OJS journals while preserving OJS 3.5.0.6 as the publication system of record. Retained Next.js portal aggregation architecture with OJS backend projection.
+- D13 (2026-11-26, verified diagnosis / proposal implemented in D16): installed OJS 3.5.0.6 intentionally denies anonymous stock issue REST through global policy and route middleware. Do not weaken stock authorization, introduce admin tokens, or assume a public-access setting fixes it. Proposed independent GenericPlugin publicPublications controller uses APIHandler::endpoints::plugin and registerPluginApiControllers, explicit public DTOs and strict current-publication/journal ownership checks. Owner approval received ("tiếp tục thực hiện"). Implemented and verified in D16.
+- D14 (2026-11-26): source and HTTP reachability are separate from integration acceptance. OAI's installed query checks published submission/issue and enabled/OAI-enabled journal but not explicit p.status or issue/section context equality; retain exact-current-publication/ownership validation and no OAI-only fallback. HTML landing access does not prove galley entitlement.
+- D01: Preserve OJS as system of record; portal read-only, submit/review/editorial links return to correct OJS journal.
+- D02: Retain Next.js/TypeScript modular monolith, no new framework or database initially.
+- D03: Configured OJS_PUBLIC_JOURNALS registry now because contexts requests denied; automatic discovery deferred, only opt-in public paths.
+- D04: Use published issue list/detail, not unavailable submissions/sections APIs; exact current publication matching. OAI supplements metadata rather than overriding publication visibility.
+- D05: Anonymous server-side reads preferred; no admin token in browser or proxy. User directory proxy disabled. Fail closed on uncertain publication visibility.
+- D06: Keep wireframe journal layout and extend separate portal level. No invented ISSN/DOI/statistics/PDF availability.
+- D07: Keep feature branch separate, preserve main; shared docs are portable project memory, not implicit cross-tool conversation memory.
+- D08: Preserve existing legacy status adapter temporarily; migrate UI to public DTOs before removing it. Installed OJS source now confirms STATUS_PUBLISHED=3 (2026-11-26); status 7 remains display-only.
+- D09 (2026-11-26): Use saxes namespace-aware parsing; reject DTDs and redirects. Configure a directly verified OAI locale endpoint rather than following arbitrary redirects. OAI enrichment is optional and off by default; its failure never suppresses REST-confirmed records.
+- D10: Merge only exact canonical reader URL identities after the same approved public-base transformation. Preserve explicit xml:lang; unlabelled descriptions stay unlabelled. No numeric-ID/title guessing and no OAI-only publication fallback when REST is denied.
+- D11: Retain Cache Components; replace incompatible dynamic exports with loading/Suspense boundaries. New public metadata is rendered as React text, not raw HTML.
+- D12: Portal navigation exposes working directory/search routes; retain legacy pages for staged migration but remove unverified footer contacts/policy links. Do not claim full wireframe acceptance until live and responsive tests pass.

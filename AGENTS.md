@@ -28,3 +28,12 @@ Retain qualifying friction even if it is later fixed or worked around; record th
 Before the final response, run one reporting pass. If candidates remain, from this file's directory run `npx --no-install next internal agent-feedback-instructions` once without piping or truncating its output. Follow its output or error guidance. If a network sandbox blocks it, retry with network access; if it still returns no output, continue normally.
 
 <!-- END:nextjs-agent-feedback -->
+
+
+## TDU eJournal project instructions
+
+Start every implementation session by reading [HANDOFF](docs/HANDOFF.md), [project context](docs/PROJECT_CONTEXT.md), [architecture](docs/ARCHITECTURE.md), [API evidence](docs/API_ENDPOINTS.md), and [UI requirements](docs/UI_UX_GUIDELINES.md). Check the actual branch, working tree, latest commits and code against these documents; they are not a substitute for inspection. Preserve local changes. Work on the feature branch, never merge into main without approval and passing checks.
+
+OJS is the publication system of record. Use the configured public journal registry and public published issue/detail endpoints; never expose privileged upstream payloads, workflow URLs, keys or private records. Use the evidence in docs/OJS_API_CONTEXT.md. Do not invent missing metadata or treat test fixtures as a live integration pass.
+
+Before implementation, read the installed Next.js documentation as instructed above. Run relevant unit tests, typecheck, lint, production build and live integration checks where possible. Record each actual result (PASS/FAIL/BLOCKED/NOT RUN), including command and failure details without secrets. Update HANDOFF, DEVELOPMENT_LOG, TEST_REPORT, ROADMAP and decisions when applicable. Keep commits focused. Never commit .env.local, private source materials or raw privileged JSON.

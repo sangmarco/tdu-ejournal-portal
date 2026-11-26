@@ -1,0 +1,2 @@
+# Source references
+Owner-provided wireframe: four pages (journal homepage desktop, article detail, search, mobile). Requirements transcribed in ../UI_UX_GUIDELINES.md. Owner-provided API TEST sheet dated 25/11/2026 and rendered OAI-PMH report: summarized in ../OJS_API_CONTEXT.md and ../API_ENDPOINTS.md. Original private documents and sharing links are intentionally not committed to this public repository. Obtain raw XML locally and construct sanitized fixtures; do not reproduce actual user or editorial data.

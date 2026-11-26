@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Locale, dict } from '@/lib/i18n';
 import { useIssues } from '@/hooks/useOJS';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import Image from 'next/image';
 
 function YearFilter({ locale, selectedYear, years, onYearChange }: {
   locale: Locale;
@@ -113,7 +113,7 @@ export default function ArchivesContent({ locale, year }: { locale: Locale; year
               <Card className="p-6 hover:shadow-lg transition-shadow h-full flex flex-col">
                 {issue.coverImage && (
                   <div className="aspect-[4/3] w-full rounded-lg overflow-hidden mb-4 bg-gray-100 relative">
-                    <img
+                    <Image fill unoptimized
                       src={`${process.env.OJS_BASE_URL || 'http://localhost/ojs'}/public/journals/1/${issue.coverImage.fileName}`}
                       alt={issue.title?.[locale] || issue.title?.vi || ''}
                       className="w-full h-full object-cover"

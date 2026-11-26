@@ -22,31 +22,63 @@ export function getLocaleFromPath(pathname: string): Locale {
 }
 
 // Translation dictionary for easy access by locale
-export const dict: Record<Locale, Record<string, any>> = {
+type TranslationDictionary = Record<string, string> & Partial<{
+  beforeSubmittingItems: string[];
+  manuscriptRequirementsItems: string[];
+  ethicalRequirementsItems: string[];
+  keyPointsItems: string[];
+  licensePermissionsItems: string[];
+  licenseRequirementsItems: string[];
+  authorBenefitsItems: string[];
+  faqItems: { q: string; a: string }[];
+  reviewCriteriaItems: string[];
+  recommendationItems: string[];
+  ethicsItems: string[];
+  authorRightsItems: string[];
+  licenseGrantItems: string[];
+  journalRightsItems: string[];
+  ccLicenses: { id: string; name: string; desc: string; permissions: string[] }[];
+  thirdPartyContentItems: string[];
+  termsSections: { title: string; content: string[] }[];
+  officeHoursItems: string[];
+  socialLinks: { name: string; url: string; icon: string }[];
+  privacySections: { title: string; content: string[] }[];
+  checklistItems: string[];
+}>;
+
+export const dict: Record<Locale, TranslationDictionary> = {
   vi: {},
   en: {},
 };
 
 // Initialize dict with all translation keys
 function initDict() {
-  const keys = translationKeys as any;
+  const keys = translationKeys;
   for (const locale of locales) {
     dict[locale] = {};
     flattenTranslations(keys, dict[locale], locale);
   }
 }
 
-function flattenTranslations(obj: any, target: any, locale: Locale, prefix = '') {
+type TranslationTree = { readonly [key: string]: string | TranslationTree };
+
+function flattenTranslations(obj: TranslationTree, target: Record<string, string>, locale: Locale, prefix = '') {
   for (const key of Object.keys(obj)) {
     const value = obj[key];
     const newKey = prefix ? `${prefix}.${key}` : key;
-    if (value && typeof value === 'object' && !Array.isArray(value) && value[locale] !== undefined) {
+    if (value && typeof value === 'object' && !Array.isArray(value) && typeof value[locale] === 'string') {
       target[newKey] = value[locale];
       target[key] = value[locale];
     } else if (value && typeof value === 'object' && !Array.isArray(value)) {
       flattenTranslations(value, target, locale, newKey);
     }
   }
+}
+
+// Legacy informational pages may reference optional lists not yet in the dictionary.
+export function getTranslationList(locale: Locale, key: string): string[] {
+  const value: unknown = dict[locale][key];
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 }
 
 // Helper to get nested translation

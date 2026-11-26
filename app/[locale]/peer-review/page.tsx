@@ -1,9 +1,8 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Locale, locales, dict } from '@/lib/i18n';
+import { Locale, locales, dict, getTranslationList } from '@/lib/i18n';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 
 interface PeerReviewPageProps {
@@ -84,7 +83,7 @@ function ModelCard({ model, locale }: { model: typeof reviewModels[0]; locale: L
       </div>
       <p className="text-gray-600 mb-4">{t[model.descKey]}</p>
       <ul className="space-y-2">
-        {t[model.featuresKey]?.map((feature: string, i: number) => (
+        {getTranslationList(locale, model.featuresKey).map((feature: string, i: number) => (
           <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
             <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />

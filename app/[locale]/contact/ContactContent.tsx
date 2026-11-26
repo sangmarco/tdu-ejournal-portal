@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
 export default function ContactContent({ locale }: { locale: Locale }) {
-  const { journal, loading, error } = useJournal();
+  const { journal } = useJournal();
   const t = dict[locale];
 
   return (

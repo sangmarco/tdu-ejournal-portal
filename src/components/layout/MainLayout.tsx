@@ -13,8 +13,8 @@ interface MainLayoutProps {
 export function MainLayout({ children, locale }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
-      <Header locale={locale} />
-      <main className="flex-1" id="main-content">
+      <Suspense fallback={null}><Header locale={locale} /></Suspense>
+      <main className="flex-1" id="main-content" tabIndex={-1}>
         {children}
       </main>
       <Suspense fallback={null}>
