@@ -11,7 +11,8 @@ import type {
   OJSSearchParams,
   OJSPaginatedResponse,
   OJSError,
-  OJSLocale,
+  OJSGalley,
+  OJSFile,
 } from './types';
 
 interface FetchOptions extends RequestInit {
@@ -134,12 +135,12 @@ export async function getArticle(articleId: number): Promise<OJSArticle> {
   return fetchWithAuth<OJSArticle>(`/articles/${articleId}`);
 }
 
-export async function getArticleGalleys(articleId: number): Promise<any[]> {
-  return fetchWithAuth<any[]>(`/articles/${articleId}/galleys`);
+export async function getArticleGalleys(articleId: number): Promise<OJSGalley[]> {
+  return fetchWithAuth<OJSGalley[]>(`/articles/${articleId}/galleys`);
 }
 
-export async function getArticleFiles(articleId: number): Promise<any[]> {
-  return fetchWithAuth<any[]>(`/articles/${articleId}/files`);
+export async function getArticleFiles(articleId: number): Promise<OJSFile[]> {
+  return fetchWithAuth<OJSFile[]>(`/articles/${articleId}/files`);
 }
 
 // ==================== Section & Category Endpoints ====================
